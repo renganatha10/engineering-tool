@@ -5,9 +5,11 @@
   "dependencies": {
     "antd": "^3.19.2",
     "react": "^16.8.6",
+    "react-beautiful-dnd": "^11.0.3",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "styled-components": "^4.2.1"
+    "styled-components": "^4.2.1",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -34,8 +36,10 @@
     "@types/jest": "24.0.13",
     "@types/node": "12.0.4",
     "@types/react": "16.8.19",
+    "@types/react-beautiful-dnd": "^11.0.2",
     "@types/react-dom": "16.8.4",
     "@types/styled-components": "^4.1.15",
+    "@types/uuid": "^3.4.4",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
     "babel-plugin-import": "^1.12.0",

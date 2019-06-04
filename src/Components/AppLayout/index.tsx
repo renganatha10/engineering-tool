@@ -1,21 +1,40 @@
-import * as React from 'react';
+import React from 'react';
 import { Layout, Collapse } from 'antd';
 import styled from 'styled-components';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import uuid from 'uuid/v1';
 
-import ExpandIcon from './ExpandIcon';
+import FunctionModal from '../FunctionModal';
+import ExpandIcon from './../ExpandIcon';
+import CreateIcon from './../CreateIcon';
+import Sources from './../Sources';
+import Functions from './../Functions';
+
+type SourceType = string[];
+interface FunctionType {
+  name: string;
+  numberOfInputs: number;
+  numberOfOutputs: number;
+  id: string;
+}
+
+interface ConnectionType {
+  functionId: string;
+  sources: string[];
+  output: string[];
+}
 
 const { Content, Sider } = Layout;
 const { Panel } = Collapse;
 
 const Container = styled(Layout)`
   height: 100%;
+  overflow-x: scroll !important;
 `;
 
-const sourceText = `
-  ListDown the Source
+const StyledSideBar = styled(Sider)`
+  overflow: scroll;
 `;
-
-const functionText = `ListDown Funciton`;
 
 const customPanelStyle = {
   background: '#f7f7f7',
@@ -28,33 +47,95 @@ const collpaseStyle = {
   borderRadius: 0,
 };
 
+const SVGWrapper = styled.div`
+  height: 1400px;
+  width: 1400px;
+  padding: 12px;
+`;
+
 const AppLayout: React.FC = props => {
+  const [sources, setSource] = React.useState<SourceType>(['S1']);
+  const [functions, setFunctions] = React.useState<FunctionType[]>([
+    { id: uuid(), name: '⅀', numberOfInputs: 3, numberOfOutputs: 1 },
+  ]);
+  const [isFunctionModalVisible, setFunctionModal] = React.useState<boolean>(
+    false
+  );
+  const [connections, setConnections] = React.useState<ConnectionType[]>([]);
+
+  const onFunctionCreate = (func: FunctionType) => {
+    setFunctions(functions.concat(func));
+    setFunctionModal(false);
+  };
+
+  const onSourceCreate = () => {
+    const sourceLength = sources.length;
+    setSource(sources.concat(`S${sourceLength + 1}`));
+  };
+
+  const onOpenFunctionModal = () => {
+    setFunctionModal(true);
+  };
+
+  const onCloseFunctionModal = () => {
+    setFunctionModal(false);
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    const { draggableId, destination } = result;
+    if (destination) {
+      const newConnection = {
+        functionId: draggableId,
+        sources: [],
+        output: [],
+      };
+      setConnections(connections.concat(newConnection));
+    }
+  };
+
   const { children } = props;
+
   return (
-    <Container>
-      <Sider width={250} collapsible={false}>
-        <Collapse
-          style={collpaseStyle}
-          bordered={true}
-          defaultActiveKey={['1']}
-          expandIcon={ExpandIcon}
-        >
-          <Panel style={customPanelStyle} header="Sources" key="1">
-            <p>{sourceText}</p>
-          </Panel>
-          <Panel style={customPanelStyle} header="Functions" key="2">
-            <p>{functionText}</p>
-          </Panel>
-        </Collapse>
-      </Sider>
+    <DragDropContext onDragEnd={onDragEnd}>
       <Container>
-        <Content style={{ margin: '24px 16px 0' }}>
-          <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-            {children}
-          </div>
-        </Content>
+        <StyledSideBar width={250} collapsible={false}>
+          <Collapse
+            style={collpaseStyle}
+            bordered={true}
+            defaultActiveKey={['2']}
+            accordion={true}
+            expandIcon={ExpandIcon}
+          >
+            <Panel
+              style={customPanelStyle}
+              header="Sources"
+              extra={<CreateIcon onIconClick={onSourceCreate} />}
+              key="1"
+            >
+              <Sources sources={sources} />
+            </Panel>
+            <Panel
+              style={customPanelStyle}
+              header="Functions"
+              extra={<CreateIcon onIconClick={onOpenFunctionModal} />}
+              key="2"
+            >
+              <Functions functions={functions} />
+            </Panel>
+          </Collapse>
+        </StyledSideBar>
+        <Container>
+          <Content>
+            <SVGWrapper>{children}</SVGWrapper>
+          </Content>
+        </Container>
+        <FunctionModal
+          onCreate={onFunctionCreate}
+          onCancel={onCloseFunctionModal}
+          isFunctionModalVisible={isFunctionModalVisible}
+        />
       </Container>
-    </Container>
+    </DragDropContext>
   );
 };
 
