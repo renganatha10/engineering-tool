@@ -8,9 +8,10 @@ const GlobalStyles = createGlobalStyle`
         right: 0;
         left: 0
     }
-    #root{
+    #root, body{
         height: 100%;
         width: 100%;
+        margin: 0
     }    
 `;
 

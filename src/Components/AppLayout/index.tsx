@@ -24,12 +24,15 @@ interface ConnectionType {
   output: string[];
 }
 
-const { Content, Sider } = Layout;
+const { Sider } = Layout;
 const { Panel } = Collapse;
 
-const Container = styled(Layout)`
+const LeftBar = styled.div`
   height: 100%;
-  overflow-x: scroll !important;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 250px;
 `;
 
 const StyledSideBar = styled(Sider)`
@@ -47,13 +50,7 @@ const collpaseStyle = {
   borderRadius: 0,
 };
 
-const SVGWrapper = styled.div`
-  height: 1400px;
-  width: 1400px;
-  padding: 12px;
-`;
-
-const AppLayout: React.FC = props => {
+const AppLayout: React.FC = () => {
   const [sources, setSource] = React.useState<SourceType>(['S1']);
   const [functions, setFunctions] = React.useState<FunctionType[]>([
     { id: uuid(), name: '⅀', numberOfInputs: 3, numberOfOutputs: 1 },
@@ -93,11 +90,9 @@ const AppLayout: React.FC = props => {
     }
   };
 
-  const { children } = props;
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Container>
+      <LeftBar>
         <StyledSideBar width={250} collapsible={false}>
           <Collapse
             style={collpaseStyle}
@@ -124,17 +119,12 @@ const AppLayout: React.FC = props => {
             </Panel>
           </Collapse>
         </StyledSideBar>
-        <Container>
-          <Content>
-            <SVGWrapper>{children}</SVGWrapper>
-          </Content>
-        </Container>
         <FunctionModal
           onCreate={onFunctionCreate}
           onCancel={onCloseFunctionModal}
           isFunctionModalVisible={isFunctionModalVisible}
         />
-      </Container>
+      </LeftBar>
     </DragDropContext>
   );
 };

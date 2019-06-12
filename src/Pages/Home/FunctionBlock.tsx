@@ -1,4 +1,5 @@
 import React from 'react';
+import BlockInputOutput from './BlockInputOutput';
 
 interface Props {
   name: string;
@@ -42,33 +43,31 @@ const FunctionBlock = (props: Props) => {
       >
         {name}
       </text>
-
       {Array.from(Array(numberOfInputs)).map((_, index) => {
         const y1 = rectY + inputVariant * (index + 1);
         return (
-          <line
-            fill={'black'}
-            stroke={'black'}
-            key={`llll${index}`}
+          <BlockInputOutput
+            key={`input${index}`}
             x1={lineX}
             y1={y1}
             x2={rectX}
             y2={y1}
+            isInputSource={true}
+            uniqName={`input${index}`}
           />
         );
       })}
-
       {Array.from(Array(numberOfOutputs)).map((_, index) => {
         const y1 = rectY + outputVariant * (index + 1);
         return (
-          <line
-            fill={'black'}
-            stroke={'black'}
-            key={`llll${index}`}
-            x1={RECT_SIZE + rectX}
+          <BlockInputOutput
+            key={`output${index}`}
             y1={y1}
+            x1={RECT_SIZE + rectX}
             x2={RECT_SIZE + rectX + (rectX - lineX)}
             y2={y1}
+            isInputSource={false}
+            uniqName={`output${index}`}
           />
         );
       })}

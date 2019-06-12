@@ -58,7 +58,9 @@
     "XMLHttpRequest": false,
     "jest": true,
     "document": true,
-    "URL": false
+    "URL": false,
+    "afterEach": true,
+    "test": true
   },
   "rules": {
     "indent": "off",

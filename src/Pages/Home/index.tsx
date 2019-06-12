@@ -1,18 +1,8 @@
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
-import styled from 'styled-components';
 
-import AppLayout from './../../Components/AppLayout';
 import FunctionBlock from './FunctionBlock';
 
 import GlobalStyles from './../../Utils/globalStyles';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
 
 const function1 = {
   id: '1',
@@ -59,51 +49,44 @@ const Home = () => {
   return (
     <React.Fragment>
       <GlobalStyles />
-      <AppLayout>
-        <Droppable droppableId={'editor'}>
-          {provided => {
-            return (
-              <Wrapper ref={provided.innerRef}>
-                <svg
-                  id={'someSvgElementId'}
-                  width="1300"
-                  height="1300"
-                  style={{ backgroundColor: 'white' }}
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  {connections
-                    .map((connection, index) => {
-                      const func = funcs.find(
-                        item => item.id === connection.functionId
-                      );
+      <svg
+        id={'someSvgElementId'}
+        width="1300"
+        height="1300"
+        style={{
+          backgroundColor: 'white',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {connections
+          .map((connection, index) => {
+            const func = funcs.find(item => item.id === connection.functionId);
 
-                      if (func) {
-                        const { name, numberOfInputs, numberOfOutputs } = func;
-                        const inputVarient = 100 / func.numberOfInputs;
-                        const outPutVarient = 100 / func.numberOfOutputs;
-                        const rectYVariant = Math.floor(index / 4);
-                        return (
-                          <FunctionBlock
-                            key={`conneciton${index}`}
-                            name={name}
-                            numberOfInputs={numberOfInputs}
-                            numberOfOutputs={numberOfOutputs}
-                            inputVariant={inputVarient}
-                            outputVariant={outPutVarient}
-                            rectX={102.5 + (index - 4 * rectYVariant) * 295}
-                            rectY={100 + rectYVariant * 220}
-                            lineX={72.5 + (index - 4 * rectYVariant) * 295}
-                          />
-                        );
-                      }
-                    })
-                    .filter(item => item)}
-                </svg>
-              </Wrapper>
-            );
-          }}
-        </Droppable>
-      </AppLayout>
+            if (func) {
+              const { name, numberOfInputs, numberOfOutputs } = func;
+              const inputVarient = 100 / func.numberOfInputs;
+              const outPutVarient = 100 / func.numberOfOutputs;
+              const rectYVariant = Math.floor(index / 4);
+              return (
+                <FunctionBlock
+                  key={`conneciton${index}`}
+                  name={name}
+                  numberOfInputs={numberOfInputs}
+                  numberOfOutputs={numberOfOutputs}
+                  inputVariant={inputVarient}
+                  outputVariant={outPutVarient}
+                  rectX={102.5 + (index - 4 * rectYVariant) * 295}
+                  rectY={100 + rectYVariant * 220}
+                  lineX={72.5 + (index - 4 * rectYVariant) * 295}
+                />
+              );
+            }
+          })
+          .filter(item => item)}
+      </svg>
     </React.Fragment>
   );
 };
