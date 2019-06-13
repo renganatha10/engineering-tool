@@ -10,6 +10,9 @@ interface Props {
   rectX: number;
   rectY: number;
   lineX: number;
+  id: string;
+  onCircleMouseDown: (x: number, y: number, functionId: string) => void;
+  onCircleMouseUp: (functionId: string) => void;
 }
 
 const FunctionBlock = (props: Props) => {
@@ -22,6 +25,9 @@ const FunctionBlock = (props: Props) => {
     rectX,
     lineX,
     rectY,
+    onCircleMouseUp,
+    onCircleMouseDown,
+    id,
   } = props;
 
   const RECT_SIZE = 120;
@@ -34,6 +40,7 @@ const FunctionBlock = (props: Props) => {
         width={RECT_SIZE}
         fill={'transparent'}
         stroke={'black'}
+        pointerEvents={'none'}
       />
       <text
         x={RECT_SIZE / 2 + rectX}
@@ -54,6 +61,9 @@ const FunctionBlock = (props: Props) => {
             y2={y1}
             isInputSource={true}
             uniqName={`input${index}`}
+            onCircleMouseUp={onCircleMouseUp}
+            onCircleMouseDown={onCircleMouseDown}
+            functionId={id}
           />
         );
       })}
@@ -68,6 +78,9 @@ const FunctionBlock = (props: Props) => {
             y2={y1}
             isInputSource={false}
             uniqName={`output${index}`}
+            onCircleMouseUp={onCircleMouseUp}
+            onCircleMouseDown={onCircleMouseDown}
+            functionId={id}
           />
         );
       })}
@@ -75,4 +88,4 @@ const FunctionBlock = (props: Props) => {
   );
 };
 
-export default FunctionBlock;
+export default React.memo(FunctionBlock);

@@ -4,7 +4,7 @@ import { Provider } from 'mobx-react';
 
 import GlobalStyles from './Utils/globalStyles';
 
-import App from './Pages/FunctionCreation';
+import App from './Pages/Home';
 
 import NodeStore from './store/node';
 

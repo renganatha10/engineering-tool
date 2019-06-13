@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const StyledCircle = styled.circle`
@@ -12,74 +12,49 @@ interface Props {
   y2: number;
   isInputSource: boolean;
   uniqName: string;
+  onCircleMouseDown: (x: number, y: number, functionId: string) => void;
+  onCircleMouseUp: (functionId: string) => void;
+  functionId: string;
 }
 
 const BlockInputOutput = (props: Props) => {
-  const { y1, x1, x2, y2, isInputSource } = props;
+  const {
+    y1,
+    x1,
+    x2,
+    y2,
+    isInputSource,
+    onCircleMouseUp,
+    onCircleMouseDown,
+    functionId,
+  } = props;
 
   const initXPosition = isInputSource ? x1 : x2;
-
-  const [pathX, setPathX] = useState(initXPosition);
-  const [pathY, setPathY] = useState(y1);
-
-  const onCircleMouseMove = useCallback((e: MouseEvent) => {
-    const { clientX, clientY } = e;
-    setPathX(clientX);
-    setPathY(clientY);
-  }, []);
-
-  const onCircleMouseUp = () => {
-    document.removeEventListener('mousemove', onCircleMouseMove);
-  };
-
-  const onCircleMouseDown = () => {
-    document.addEventListener('mousemove', onCircleMouseMove);
-  };
-
-  const onCircleMouseEnter = () => {
-    //eslint-disable-next-line
-    console.log('On Circle Mouse Enter');
-  };
-  const onCircleMouseLeave = () => {
-    //eslint-disable-next-line
-    console.log('On Circle Mouse Leave');
-  };
-  const onCircleMouseOut = () => {
-    //eslint-disable-next-line
-    console.log('On Circle Mouse Out');
-  };
-  const onMouseMove = () => {
-    //eslint-disable-next-line
-    console.log('On Circle Mouse Move');
-  };
-  const onCircleMouseOver = () => {
-    //eslint-disable-next-line
-    console.log('On Circle Mouse Over');
-  };
 
   const dragStart = () => {
     return false;
   };
 
+  const onCircleMouseDownCB = () => {
+    onCircleMouseDown(initXPosition, y1, functionId);
+  };
+
+  const onCircleMouseUpCB = () => {
+    onCircleMouseUp(functionId);
+  };
+
   return (
     <React.Fragment>
       <line fill={'black'} stroke={'black'} x1={x1} y1={y1} x2={x2} y2={y2} />
-      <StyledCircle cx={initXPosition} cy={y1} fill={'green'} r={5} />
-      <circle
-        onMouseUp={onCircleMouseUp}
-        onMouseDown={onCircleMouseDown}
-        onMouseEnter={onCircleMouseEnter}
-        onMouseLeave={onCircleMouseLeave}
-        onMouseOut={onCircleMouseOut}
-        onMouseMove={onMouseMove}
-        onMouseOver={onCircleMouseOver}
+      <StyledCircle
+        onMouseUp={onCircleMouseUpCB}
+        onMouseDown={onCircleMouseDownCB}
         onDragStart={dragStart}
-        cx={pathX}
-        cy={pathY}
+        cx={initXPosition}
+        cy={y1}
         fill={'green'}
         r={5}
       />
-      <path d={`M${initXPosition} ${y1} L${pathX} ${pathY}`} stroke={'cyan'} />
     </React.Fragment>
   );
 };

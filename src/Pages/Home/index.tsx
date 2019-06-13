@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import FunctionBlock from './FunctionBlock';
 
@@ -46,6 +46,27 @@ const connections = [
 ];
 
 const Home = () => {
+  const [pathX, setPathX] = useState(0);
+  const [pathY, setPathY] = useState(0);
+  const [initialX, setInitalPathX] = useState(0);
+  const [initialY, setInitalPathY] = useState(0);
+
+  const onCircleMouseMove = useCallback((e: MouseEvent) => {
+    const { clientX, clientY } = e;
+    setPathX(clientX);
+    setPathY(clientY);
+  }, []);
+
+  const onCircleMouseUp = useCallback(() => {
+    document.removeEventListener('mousemove', onCircleMouseMove);
+  }, []);
+
+  const onCircleMouseDown = useCallback((x1: number, y1: number) => {
+    setInitalPathX(x1);
+    setInitalPathY(y1);
+    document.addEventListener('mousemove', onCircleMouseMove);
+  }, []);
+
   return (
     <React.Fragment>
       <GlobalStyles />
@@ -78,6 +99,9 @@ const Home = () => {
                   numberOfOutputs={numberOfOutputs}
                   inputVariant={inputVarient}
                   outputVariant={outPutVarient}
+                  onCircleMouseUp={onCircleMouseUp}
+                  onCircleMouseDown={onCircleMouseDown}
+                  id={func.id}
                   rectX={102.5 + (index - 4 * rectYVariant) * 295}
                   rectY={100 + rectYVariant * 220}
                   lineX={72.5 + (index - 4 * rectYVariant) * 295}
@@ -86,6 +110,11 @@ const Home = () => {
             }
           })
           .filter(item => item)}
+
+        <path
+          d={`M${initialX} ${initialY} L${pathX} ${pathY}`}
+          stroke={'cyan'}
+        />
       </svg>
     </React.Fragment>
   );
