@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Form, InputNumber, Input } from 'antd';
+import { Modal, Form } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
+import FunctionCreation from './../../Pages/FunctionCreation';
 
 interface FunctionFormProps extends FormComponentProps {
   visible: boolean;
@@ -10,12 +11,7 @@ interface FunctionFormProps extends FormComponentProps {
 
 class FunctionForm extends React.PureComponent<FunctionFormProps> {
   public render() {
-    const { onCancel, onCreate, form, visible } = this.props;
-    const { getFieldDecorator } = form;
-    const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
-    };
+    const { onCancel, onCreate, visible } = this.props;
     return (
       <Modal
         onCancel={onCancel}
@@ -23,40 +19,9 @@ class FunctionForm extends React.PureComponent<FunctionFormProps> {
         title="Create Function"
         visible={visible}
         okText="Create"
+        width={800}
       >
-        <Form {...formItemLayout}>
-          <Form.Item label="Function Name">
-            {getFieldDecorator('name', {
-              rules: [
-                { required: true, message: 'Please input your function name!' },
-              ],
-            })(<Input />)}
-          </Form.Item>
-          <Form.Item label="No of input">
-            {getFieldDecorator('input', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Please input number of inputs',
-                },
-              ],
-              initialValue: 1,
-            })(<InputNumber min={1} max={5} />)}
-            <span className="ant-form-text"> nodes</span>
-          </Form.Item>
-          <Form.Item label="No of output">
-            {getFieldDecorator('output', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Please input number of outputs',
-                },
-              ],
-              initialValue: 1,
-            })(<InputNumber min={1} max={5} />)}
-            <span className="ant-form-text"> nodes</span>
-          </Form.Item>
-        </Form>{' '}
+        <FunctionCreation />
       </Modal>
     );
   }

@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-    :root{
+    :root {
         position: absolute;
         top: 0;
         bottom: 0;

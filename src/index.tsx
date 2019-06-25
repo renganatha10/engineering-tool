@@ -1,21 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'mobx-react';
 
 import GlobalStyles from './Utils/globalStyles';
 
-import App from './Pages/Home';
-
-import NodeStore from './store/node';
-
-const nodeStore = NodeStore.create({ nodes: {} });
+import App from './Pages/TypesCreation';
 
 ReactDOM.render(
-  <Provider nodeStore={nodeStore}>
-    <React.Fragment>
-      <GlobalStyles />
-      <App />
-    </React.Fragment>
-  </Provider>,
+  <React.Fragment>
+    <GlobalStyles />
+    <App />
+  </React.Fragment>,
   document.getElementById('root')
 );

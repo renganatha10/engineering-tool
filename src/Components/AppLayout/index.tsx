@@ -1,13 +1,11 @@
 import React from 'react';
 import { Layout, Collapse } from 'antd';
 import styled from 'styled-components';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import uuid from 'uuid/v1';
 
 import FunctionModal from '../FunctionModal';
 import ExpandIcon from './../ExpandIcon';
 import CreateIcon from './../CreateIcon';
-import Sources from './../Sources';
 import Functions from './../Functions';
 
 type SourceType = string[];
@@ -28,11 +26,12 @@ const { Sider } = Layout;
 const { Panel } = Collapse;
 
 const LeftBar = styled.div`
-  height: 100%;
   position: absolute;
   left: 0;
   top: 0;
+  bottom: 0;
   width: 250px;
+  background-color: white;
 `;
 
 const StyledSideBar = styled(Sider)`
@@ -51,23 +50,16 @@ const collpaseStyle = {
 };
 
 const AppLayout: React.FC = () => {
-  const [sources, setSource] = React.useState<SourceType>(['S1']);
   const [functions, setFunctions] = React.useState<FunctionType[]>([
     { id: uuid(), name: '⅀', numberOfInputs: 3, numberOfOutputs: 1 },
   ]);
   const [isFunctionModalVisible, setFunctionModal] = React.useState<boolean>(
     false
   );
-  const [connections, setConnections] = React.useState<ConnectionType[]>([]);
 
   const onFunctionCreate = (func: FunctionType) => {
     setFunctions(functions.concat(func));
     setFunctionModal(false);
-  };
-
-  const onSourceCreate = () => {
-    const sourceLength = sources.length;
-    setSource(sources.concat(`S${sourceLength + 1}`));
   };
 
   const onOpenFunctionModal = () => {
@@ -78,54 +70,32 @@ const AppLayout: React.FC = () => {
     setFunctionModal(false);
   };
 
-  const onDragEnd = (result: DropResult) => {
-    const { draggableId, destination } = result;
-    if (destination) {
-      const newConnection = {
-        functionId: draggableId,
-        sources: [],
-        output: [],
-      };
-      setConnections(connections.concat(newConnection));
-    }
-  };
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <LeftBar>
-        <StyledSideBar width={250} collapsible={false}>
-          <Collapse
-            style={collpaseStyle}
-            bordered={true}
-            defaultActiveKey={['2']}
-            accordion={true}
-            expandIcon={ExpandIcon}
+    <LeftBar>
+      <StyledSideBar width={250} collapsible={false}>
+        <Collapse
+          style={collpaseStyle}
+          bordered={true}
+          defaultActiveKey={['2']}
+          accordion={true}
+          expandIcon={ExpandIcon}
+        >
+          <Panel
+            style={customPanelStyle}
+            header="Functions"
+            extra={<CreateIcon onIconClick={onOpenFunctionModal} />}
+            key="2"
           >
-            <Panel
-              style={customPanelStyle}
-              header="Sources"
-              extra={<CreateIcon onIconClick={onSourceCreate} />}
-              key="1"
-            >
-              <Sources sources={sources} />
-            </Panel>
-            <Panel
-              style={customPanelStyle}
-              header="Functions"
-              extra={<CreateIcon onIconClick={onOpenFunctionModal} />}
-              key="2"
-            >
-              <Functions functions={functions} />
-            </Panel>
-          </Collapse>
-        </StyledSideBar>
-        <FunctionModal
-          onCreate={onFunctionCreate}
-          onCancel={onCloseFunctionModal}
-          isFunctionModalVisible={isFunctionModalVisible}
-        />
-      </LeftBar>
-    </DragDropContext>
+            <Functions functions={functions} />
+          </Panel>
+        </Collapse>
+      </StyledSideBar>
+      <FunctionModal
+        onCreate={onFunctionCreate}
+        onCancel={onCloseFunctionModal}
+        isFunctionModalVisible={isFunctionModalVisible}
+      />
+    </LeftBar>
   );
 };
 
