@@ -21,10 +21,10 @@ class TypesCreation extends PureComponent<{}> {
   public lines: fabric.Line[] = [];
 
   public componentDidMount() {
-    this.canvas = new fabric.Canvas('c', { selection: false });
-    this.canvas.on('mouse:up', this.onMouseUp);
-    this.canvas.on('mouse:down', this.onMouseDown);
-    this._addGrids();
+    // this.canvas = new fabric.Canvas('c', { selection: false });
+    // this.canvas.on('mouse:up', this.onMouseUp);
+    // this.canvas.on('mouse:down', this.onMouseDown);
+    // this._addGrids();
   }
 
   public onMouseUp = (option: fabric.IEvent) => {

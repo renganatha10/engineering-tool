@@ -7,7 +7,7 @@ class TypesCreation extends Component<{}> {
     return (
       <React.Fragment>
         <Canvas />
-        <AppLayout />
+        {/* <AppLayout /> */}
       </React.Fragment>
     );
   }

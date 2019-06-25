@@ -60,7 +60,8 @@
     "document": true,
     "URL": false,
     "afterEach": true,
-    "test": true
+    "test": true,
+    "WeakMap": true
   },
   "rules": {
     "indent": "off",
