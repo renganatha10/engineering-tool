@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Layout, Collapse } from 'antd';
 import styled from 'styled-components';
-import uuid from 'uuid/v1';
+import uuid from 'uuid/v4';
 
-import FunctionModal from '../FunctionModal';
+import { FunctionContext } from './../../Context/FunctionStoreContext';
+import { FunctionsContext } from './../../Context/FunctionsStoreContext';
+
+import FunctionModal from './../FunctionModal';
 import ExpandIcon from './../ExpandIcon';
 import CreateIcon from './../CreateIcon';
 import Functions from './../Functions';
@@ -50,15 +53,31 @@ const collpaseStyle = {
 };
 
 const AppLayout: React.FC = () => {
-  const [functions, setFunctions] = React.useState<FunctionType[]>([
-    { id: uuid(), name: '⅀', numberOfInputs: 3, numberOfOutputs: 1 },
-  ]);
+  const { inputs, outputs, conditions } = useContext(FunctionContext);
+  const { functions, onAddingFunction } = useContext(FunctionsContext);
+
+  const modifiedFunctions = functions.map(func => ({
+    name: func.name,
+    numberOfInputs: func.inputs.length,
+    numberOfOutputs: func.outputs.length,
+    id: func.id,
+  }));
+
   const [isFunctionModalVisible, setFunctionModal] = React.useState<boolean>(
     false
   );
 
-  const onFunctionCreate = (func: FunctionType) => {
-    setFunctions(functions.concat(func));
+  const onFunctionCreate = (name: string) => {
+    const newFunc = {
+      inputs,
+      outputs,
+      conditions,
+      id: uuid(),
+      name,
+    };
+
+    onAddingFunction && onAddingFunction(newFunc);
+
     setFunctionModal(false);
   };
 
@@ -86,7 +105,7 @@ const AppLayout: React.FC = () => {
             extra={<CreateIcon onIconClick={onOpenFunctionModal} />}
             key="2"
           >
-            <Functions functions={functions} />
+            <Functions functions={modifiedFunctions} />
           </Panel>
         </Collapse>
       </StyledSideBar>

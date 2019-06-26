@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import FunctionProvoider from './StoreContext';
+// import FunctionProvoider from './../../Context/FunctionStoreContext';
 import LeftBar from './LeftBar';
 import PlayGround from './PlayGround';
 import RightBar from './RightBar';
@@ -15,13 +15,11 @@ const Wrapper = styled.div`
 
 const FunctionCreation = () => {
   return (
-    <FunctionProvoider>
-      <Wrapper>
-        <LeftBar />
-        <PlayGround />
-        <RightBar />
-      </Wrapper>
-    </FunctionProvoider>
+    <Wrapper>
+      <LeftBar />
+      <PlayGround />
+      <RightBar />
+    </Wrapper>
   );
 };
 

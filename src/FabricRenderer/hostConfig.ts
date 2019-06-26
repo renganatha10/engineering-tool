@@ -1,5 +1,7 @@
 import { fabric } from 'fabric';
 import uuid from 'uuid/v1';
+//@ts-ignore
+import shallowEqual from 'shallow-equal/objects';
 
 declare global {
   interface Window {
@@ -32,8 +34,7 @@ const hostConfig = {
       const rect = new fabric.Rect({
         stroke: 'black',
         fill: 'transparent',
-        height: newProps.height,
-        width: newProps.width,
+        ...newProps,
         originX: 'center',
         originY: 'center',
       });
@@ -65,7 +66,7 @@ const hostConfig = {
       });
     }
 
-    return null;
+    return type;
   },
   appendInitialChild(parent: any, child: any) {
     if (parent && parent.type === 'group') {
@@ -99,12 +100,25 @@ const hostConfig = {
     return true;
   },
   appendChildToContainer: () => {},
-  commitUpdate() // domElement: any,
-  // updatePayload: any,
-  // type: any,
-  // oldProps: any,
-  // newProps: any
-  {},
+  commitUpdate(
+    instance: any,
+    updatePayload: any,
+    type: any,
+    oldProps: any,
+    newProps: any
+  ) {
+    if (!shallowEqual(oldProps, newProps)) {
+      Object.keys(newProps).forEach(propName => {
+        if (propName !== 'children') {
+          if (oldProps[propName] !== newProps[propName]) {
+            const propValue = newProps[propName];
+            instance && instance.set && instance.set(propName, propValue);
+            window.fabricElement.requestRenderAll();
+          }
+        }
+      });
+    }
+  },
   commitTextUpdate() {},
   removeChild() {},
 };

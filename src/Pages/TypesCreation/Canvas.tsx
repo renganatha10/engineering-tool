@@ -1,7 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { fabric } from 'fabric';
 import uuid from 'uuid/v1';
 import CurvedLink from './Links/CurvedLink';
+import {
+  FunctionsContext,
+  FunctionContextType,
+} from './../../Context/FunctionsStoreContext';
 
 interface FunctionType {
   name: string;
@@ -12,7 +16,7 @@ interface FunctionType {
 
 const RECT_SIZE = 120;
 
-class TypesCreation extends PureComponent<{}> {
+class TypesCreation extends Component<{}> {
   //@ts-ignore
   public canvas: fabric.Canvas;
   //@ts-ignore
@@ -21,10 +25,10 @@ class TypesCreation extends PureComponent<{}> {
   public lines: fabric.Line[] = [];
 
   public componentDidMount() {
-    // this.canvas = new fabric.Canvas('c', { selection: false });
-    // this.canvas.on('mouse:up', this.onMouseUp);
-    // this.canvas.on('mouse:down', this.onMouseDown);
-    // this._addGrids();
+    this.canvas = new fabric.Canvas('c', { selection: false });
+    this.canvas.on('mouse:up', this.onMouseUp);
+    this.canvas.on('mouse:down', this.onMouseDown);
+    this._addGrids();
   }
 
   public onMouseUp = (option: fabric.IEvent) => {
@@ -158,12 +162,18 @@ class TypesCreation extends PureComponent<{}> {
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const id = e.dataTransfer.getData('id');
-    this.addFunctionNode({
-      id,
-      name: 'Random',
-      numberOfInputs: 2,
-      numberOfOutputs: 1,
-    });
+
+    const { functions } = this.context as FunctionContextType;
+    const droppedFunction = functions.find(func => func.id === id);
+    if (droppedFunction) {
+      const modifiedFunctions = {
+        name: droppedFunction.name,
+        numberOfInputs: droppedFunction.inputs.length,
+        numberOfOutputs: droppedFunction.outputs.length,
+        id: droppedFunction.id,
+      };
+      this.addFunctionNode(modifiedFunctions);
+    }
   };
 
   public addFunctionNode = (func: FunctionType) => {
@@ -335,3 +345,5 @@ class TypesCreation extends PureComponent<{}> {
 }
 
 export default TypesCreation;
+
+TypesCreation.contextType = FunctionsContext;

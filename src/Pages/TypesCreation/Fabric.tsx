@@ -23,7 +23,7 @@ class FabricComp extends React.Component {
   }
 
   public componentDidMount() {
-    setTimeout(() => {
+    setInterval(() => {
       //@ts-ignore
       const { x, y } = this.state;
       this.setState({ x: x + 10, y: y + 10 });
@@ -41,7 +41,7 @@ class FabricComp extends React.Component {
           <circle />
           <text />
         </g>
-        <rect height={x} width={y} />
+        <rect left={200} top={200} height={x} width={y} />
       </canvas>
     );
   }
