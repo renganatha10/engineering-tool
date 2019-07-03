@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 
 interface State {
   name: string;
@@ -42,6 +42,10 @@ export const FunctionsContext = createContext<FunctionContextType>({
 
 const FunctionState = (props: { children: React.ReactNode }) => {
   const [functions, addFunction] = useState<Function[]>([]);
+
+  useEffect(() => {
+    window.localStorage.setItem('function', JSON.stringify(functions));
+  }, [functions]);
 
   const onAddingFunction = (func: Function) => {
     const newFunctions = functions.concat(func);
