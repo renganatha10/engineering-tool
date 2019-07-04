@@ -3,27 +3,12 @@ import { Layout, Collapse } from 'antd';
 import styled from 'styled-components';
 import uuid from 'uuid/v4';
 
-import { FunctionContext } from './../../Context/FunctionStoreContext';
-import { FunctionsContext } from './../../Context/FunctionsStoreContext';
+import { FunctionContext } from '../../Contexts/FunctionStoreContext';
+import { FunctionsContext } from '../../Contexts/FunctionsStoreContext';
 
 import FunctionModal from './../FunctionModal';
-import ExpandIcon from './../ExpandIcon';
 import CreateIcon from './../CreateIcon';
 import Functions from './../Functions';
-
-type SourceType = string[];
-interface FunctionType {
-  name: string;
-  numberOfInputs: number;
-  numberOfOutputs: number;
-  id: string;
-}
-
-interface ConnectionType {
-  functionId: string;
-  sources: string[];
-  output: string[];
-}
 
 const { Sider } = Layout;
 const { Panel } = Collapse;
@@ -97,7 +82,7 @@ const AppLayout: React.FC = () => {
           bordered={true}
           defaultActiveKey={['2']}
           accordion={true}
-          expandIcon={ExpandIcon}
+          expandIconPosition={'left'}
         >
           <Panel
             style={customPanelStyle}

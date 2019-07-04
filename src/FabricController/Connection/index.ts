@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import CurvedLine from './Links/CurvedLink';
+import CurvedLine from './CurvedLink';
 
 interface Port {
   left: number;

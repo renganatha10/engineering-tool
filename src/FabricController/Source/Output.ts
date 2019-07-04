@@ -1,13 +1,7 @@
 import { fabric } from 'fabric';
+import { ISource } from './index';
 
-interface OutputData {
-  index: number;
-  nodeId: string;
-  groupId: string;
-  y1Factor: number;
-}
-
-class Output {
+class Output implements ISource {
   public outputs: fabric.Circle[];
   private _canvas: fabric.Canvas;
   public constructor(canvas: fabric.Canvas) {

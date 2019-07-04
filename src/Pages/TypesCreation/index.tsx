@@ -1,16 +1,27 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
+
+import FunctionProvoider from './../../Contexts/FunctionStoreContext';
+import FunctionsProvoider from './../../Contexts/FunctionsStoreContext';
+
 import Canvas from './Canvas';
-import AppLayout from './../../Components/AppLayout';
-import FunctionProvoider from './../../Context/FunctionStoreContext';
-import FunctionsProvoider from './../../Context/FunctionsStoreContext';
+import RightBar from './RightBar';
+
+const HomeWrapper = styled.div`
+  position: relative;
+  height: 100%;
+  width: 100%;
+`;
 
 class TypesCreation extends Component<{}> {
   public render() {
     return (
       <FunctionProvoider>
         <FunctionsProvoider>
-          <Canvas />
-          <AppLayout />
+          <HomeWrapper>
+            <Canvas />
+            <RightBar />
+          </HomeWrapper>
         </FunctionsProvoider>
       </FunctionProvoider>
     );

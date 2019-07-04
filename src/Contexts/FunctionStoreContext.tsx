@@ -56,6 +56,7 @@ export const FunctionContext = createContext<{
   onDeletingOutput?: (id: string) => void;
   onDeletingCondition?: (id: string) => void;
   onDeletingState?: (conditionId: string, id: string) => void;
+  resetAll?: () => void;
 }>({
   inputs: [],
   outputs: [],
@@ -79,10 +80,12 @@ const FunctionState = (props: { children: React.ReactNode }) => {
 
   const onAddingInput = () =>
     updateInput(inputs.concat({ name: `Input ${inputs.length}`, id: uuid() }));
+
   const onAddingOutput = () =>
     updateOutput(
       outputs.concat({ name: `Output ${outputs.length}`, id: uuid() })
     );
+
   const onUpdatingInput = (id: string, input: InputOutputType) => {
     const selectedInput = inputs.find(condition => condition.id === id);
     if (selectedInput) {
@@ -95,6 +98,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateInput(newInputs);
     }
   };
+
   const onUpdatingOutput = (id: string, output: InputOutputType) => {
     const selectedoutput = outputs.find(output => output.id === id);
     if (selectedoutput) {
@@ -107,6 +111,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateOutput(newoutputs);
     }
   };
+
   const onUpdatingCondition = (id: string, name: string) => {
     const selectedCondition = conditions.find(condition => condition.id === id);
     if (selectedCondition) {
@@ -119,6 +124,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateCondition(newConditions);
     }
   };
+
   const onAddingCondition = () => {
     const newCondition = {
       id: uuid(),
@@ -127,6 +133,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
     };
     updateCondition(conditions.concat(newCondition));
   };
+
   const onUpdatingState = ({
     conditionId,
     state,
@@ -166,6 +173,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       }
     }
   };
+
   const onAddingState = (conditionId: string) => {
     const selectedCondition = conditions.find(
       condition => condition.id === conditionId
@@ -192,6 +200,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateCondition(newConditions);
     }
   };
+
   const onUpdateSelectedType = (
     type: SelectionMode,
     id: string,
@@ -201,6 +210,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
     updateSeledctedId(id);
     conditionId && updateSeledctedConditionId(conditionId);
   };
+
   const onDeletingInput = (id: string) => {
     const selectedInput = inputs.find(input => input.id === id);
     if (selectedInput) {
@@ -212,6 +222,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateInput(newInputs);
     }
   };
+
   const onDeletingOutput = (id: string) => {
     const selectedOutput = outputs.find(output => output.id === id);
     if (selectedOutput) {
@@ -223,6 +234,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateOutput(newOutputs);
     }
   };
+
   const onDeletingCondition = (id: string) => {
     const selectedCondition = conditions.find(condition => condition.id === id);
     if (selectedCondition) {
@@ -234,6 +246,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
       updateCondition(newConditions);
     }
   };
+
   const onDeletingState = (conditionId: string, stateId: string) => {
     const selectedCondition = conditions.find(
       condition => condition.id === conditionId
@@ -264,6 +277,15 @@ const FunctionState = (props: { children: React.ReactNode }) => {
     }
   };
 
+  const resetAll = () => {
+    updateInput([]);
+    updateOutput([]);
+    updateCondition([]);
+    updateSeledctedId('');
+    updateSelectedType('function');
+    updateSeledctedConditionId('');
+  };
+
   const { children } = props;
 
   return (
@@ -288,6 +310,7 @@ const FunctionState = (props: { children: React.ReactNode }) => {
         onDeletingState,
         onDeletingCondition,
         onDeletingOutput,
+        resetAll,
       }}
     >
       {children}

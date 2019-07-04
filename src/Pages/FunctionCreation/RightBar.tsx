@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { FunctionContext } from './../../Context/FunctionStoreContext';
+import { FunctionContext } from '../../Contexts/FunctionStoreContext';
 import InputProperties from './InputProperties';
 import ConditionProperties from './ConditionProperties';
 import StateProperties from './StateProperties';

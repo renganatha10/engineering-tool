@@ -1,4 +1,5 @@
 import { fabric } from 'fabric';
+import { ISource } from './index';
 
 interface InputData {
   index: number;
@@ -7,7 +8,7 @@ interface InputData {
   y1Factor: number;
 }
 
-class Input {
+class Input implements ISource {
   public inputs: fabric.Circle[];
   private _canvas: fabric.Canvas;
   public constructor(canvas: fabric.Canvas) {

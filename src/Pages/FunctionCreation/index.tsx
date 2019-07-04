@@ -1,24 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
 
-// import FunctionProvoider from './../../Context/FunctionStoreContext';
 import LeftBar from './LeftBar';
 import PlayGround from './PlayGround';
 import RightBar from './RightBar';
+import Header from './Header';
+
+interface FunctionCreateProps {
+  onCreateFuntion?: (name: string) => void;
+  onClose?: () => void;
+}
 
 const Wrapper = styled.div`
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex: 1;
+  background-color: white;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 `;
 
-const FunctionCreation = () => {
+const ContentWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+`;
+
+const FunctionCreation = (props: FunctionCreateProps) => {
+  const { onClose, onCreateFuntion } = props;
+
   return (
     <Wrapper>
-      <LeftBar />
-      <PlayGround />
-      <RightBar />
+      //@ts-ignore
+      <Header onClose={onClose} onSave={onCreateFuntion} />
+      <ContentWrapper>
+        <LeftBar />
+        <PlayGround />
+        <RightBar />
+      </ContentWrapper>
     </Wrapper>
   );
 };

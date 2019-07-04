@@ -2,8 +2,8 @@ import { fabric } from 'fabric';
 import uuid from 'uuid/v4';
 
 import Node from './Node';
-import Input from './Input';
-import Output from './Output';
+import Input from './Source/Input';
+import Output from './Source/Output';
 import Connection from './Connection';
 
 interface FunctionType {
@@ -11,6 +11,11 @@ interface FunctionType {
   numberOfInputs: number;
   numberOfOutputs: number;
   id: string;
+}
+
+interface PositionType {
+  x: number;
+  y: number;
 }
 
 const RECT_SIZE = 120;
@@ -43,26 +48,33 @@ class FabricController {
     );
   }
 
-  public addNodes = (func: FunctionType) => {
+  public addNodes = (func: FunctionType, position: PositionType) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
-    this.addInputs(numberOfInputs, groupId);
-    this.addOutputs(numberOfOutputs, groupId);
+    this.addInputs(numberOfInputs, groupId, position);
+    this.addOutputs(numberOfOutputs, groupId, position);
     this._nodeController.add({
       name,
       data: { id, nodeId: groupId },
+      position,
     });
   };
 
-  public addInputs = (numberOfInputs: number, groupId: string) => {
+  public addInputs = (
+    numberOfInputs: number,
+    groupId: string,
+    position: PositionType
+  ) => {
     const inputVarient = 100 / numberOfInputs;
+    const { x, y } = position;
 
     Array.from(Array(numberOfInputs)).forEach((_, index) => {
       const y1 = 100 - inputVarient * (index + 1) + 20;
       this._inputController.add({
         radius: 5,
-        top: 100 + y1,
-        left: 530 - 5,
+        top: y + y1,
+        left: x - 5,
+        fill: 'green',
         data: {
           index,
           nodeId: uuid(),
@@ -75,16 +87,22 @@ class FabricController {
     });
   };
 
-  public addOutputs = (numberOfOutputs: number, groupId: string) => {
+  public addOutputs = (
+    numberOfOutputs: number,
+    groupId: string,
+    position: PositionType
+  ) => {
     const outPutVarient = 100 / numberOfOutputs;
     Array.from(Array(numberOfOutputs)).forEach((_, index) => {
+      const { x, y } = position;
       const y1 = 100 - outPutVarient * (index + 1) + 20;
       this._outputController.add({
         radius: 5,
-        top: 100 + y1,
-        left: 530 + RECT_SIZE,
+        top: y + y1,
+        left: x + RECT_SIZE,
         originX: 'center',
         originY: 'center',
+        fill: 'red',
         data: {
           index,
           nodeId: uuid(),

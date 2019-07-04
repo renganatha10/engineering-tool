@@ -1,12 +1,24 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
+import styled from 'styled-components';
+
 import {
   FunctionsContext,
   FunctionContextType,
-} from './../../Context/FunctionsStoreContext';
+} from '../../Contexts/FunctionsStoreContext';
 
 import FabricCanvas from './../../FabricController';
 
-class TypesCreation extends Component<{}> {
+const CanvasWrapper = styled.div`
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  overflow: scroll;
+  background-color: #8bc34a1c;
+`;
+
+class TypesCreation extends PureComponent<{}> {
   public fabricCanvas = new FabricCanvas();
 
   public componentDidMount() {
@@ -26,7 +38,7 @@ class TypesCreation extends Component<{}> {
         numberOfOutputs: droppedFunction.outputs.length,
         id: droppedFunction.id,
       };
-      this.fabricCanvas.addNodes(modifiedFunctions);
+      this.fabricCanvas.addNodes(modifiedFunctions, { x: e.pageX, y: e.pageY });
     }
   };
 
@@ -36,9 +48,9 @@ class TypesCreation extends Component<{}> {
 
   public render() {
     return (
-      <div onDragOver={this.onDragOver} onDrop={this.onDrop}>
+      <CanvasWrapper onDragOver={this.onDragOver} onDrop={this.onDrop}>
         <canvas id="c" width="2000" height="1300" />
-      </div>
+      </CanvasWrapper>
     );
   }
 }

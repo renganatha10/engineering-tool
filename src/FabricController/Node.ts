@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
-import Input from './Input';
-import Output from './Output';
+import Input from './Source/Input';
+import Output from './Source/Output';
 import Connection from './Connection';
 
 const RECT_SIZE = 120;
@@ -13,6 +13,11 @@ interface Nodedata {
 interface AddArgs {
   name: string;
   data: Nodedata;
+  position: PositionType;
+}
+interface PositionType {
+  x: number;
+  y: number;
 }
 
 class Node {
@@ -33,7 +38,7 @@ class Node {
     this._connection = connection;
     this._nodes = [];
   }
-  public add({ name, data }: AddArgs) {
+  public add({ name, data, position }: AddArgs) {
     const rect = new fabric.Rect({
       stroke: 'black',
       fill: 'transparent',
@@ -49,9 +54,11 @@ class Node {
       originY: 'center',
     });
 
+    const { x, y } = position;
+
     const group = new fabric.Group([rect, text], {
-      left: 530,
-      top: 100,
+      left: x,
+      top: y,
       data,
       name: 'functionBlock',
       hasControls: false,
@@ -89,7 +96,7 @@ class Node {
       );
 
       const outputCircles = this._output.outputs.filter(
-        input => input.data.groupId === nodeId
+        output => output.data.groupId === nodeId
       );
 
       inputCircles.forEach(circle => {

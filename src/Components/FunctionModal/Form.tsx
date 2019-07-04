@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { message, Modal, Input } from 'antd';
+import { FunctionContext } from '../../Contexts/FunctionStoreContext';
 import FunctionCreation from './../../Pages/FunctionCreation';
-
-import { FunctionContext } from './../../Context/FunctionStoreContext';
 
 interface FunctionFormProps {
   visible: boolean;
@@ -39,6 +38,7 @@ const FunctionForm = (props: FunctionFormProps) => {
       onCreate(functionName);
     }
   };
+
   const onCancel = () => {};
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();

@@ -61,7 +61,10 @@ class ConditionProperties extends React.PureComponent<
           </Form.Item>
           <Form.Item>
             <Button onClick={this.onAddingState} type="primary">
-              Add States ➕
+              Add States{' '}
+              <span aria-label={'Add'} role={'img'}>
+                ➕
+              </span>
             </Button>
           </Form.Item>
         </Form>
