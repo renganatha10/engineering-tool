@@ -7,8 +7,8 @@ import RightBar from './RightBar';
 import Header from './Header';
 
 interface FunctionCreateProps {
-  onCreateFuntion?: (name: string) => void;
-  onClose?: () => void;
+  onCreateFuntion: (name: string) => void;
+  onClose: () => void;
 }
 
 const Wrapper = styled.div`
@@ -32,7 +32,6 @@ const FunctionCreation = (props: FunctionCreateProps) => {
 
   return (
     <Wrapper>
-      //@ts-ignore
       <Header onClose={onClose} onSave={onCreateFuntion} />
       <ContentWrapper>
         <LeftBar />

@@ -23,12 +23,17 @@ interface ConditionType {
   id: string;
 }
 
-interface Function {
+export interface Function {
   inputs: InputOutputType[];
   outputs: InputOutputType[];
   conditions: ConditionType[];
   id: string;
   name: string;
+}
+
+interface Props {
+  children: React.ReactNode;
+  initFunctions: Function[];
 }
 
 export interface FunctionContextType {
@@ -40,19 +45,18 @@ export const FunctionsContext = createContext<FunctionContextType>({
   functions: [],
 });
 
-const FunctionState = (props: { children: React.ReactNode }) => {
-  const [functions, addFunction] = useState<Function[]>([]);
+const FunctionState = (props: Props) => {
+  const { children, initFunctions } = props;
+  const [functions, addFunction] = useState<Function[]>(initFunctions);
 
   useEffect(() => {
-    window.localStorage.setItem('function', JSON.stringify(functions));
+    window.localStorage.setItem('functions', JSON.stringify(functions));
   }, [functions]);
 
   const onAddingFunction = (func: Function) => {
     const newFunctions = functions.concat(func);
     addFunction(newFunctions);
   };
-
-  const { children } = props;
 
   return (
     <FunctionsContext.Provider value={{ functions, onAddingFunction }}>

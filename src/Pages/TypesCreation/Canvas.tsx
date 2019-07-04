@@ -1,12 +1,10 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
-import {
-  FunctionsContext,
-  FunctionContextType,
-} from '../../Contexts/FunctionsStoreContext';
-
 import FabricCanvas from './../../FabricController';
+
+import { Device } from './../../Contexts/DevicesContext';
+import { Function } from './../../Contexts/FunctionsStoreContext';
 
 const CanvasWrapper = styled.div`
   position: absolute;
@@ -18,7 +16,14 @@ const CanvasWrapper = styled.div`
   background-color: #8bc34a1c;
 `;
 
-class TypesCreation extends PureComponent<{}> {
+type DraggbleItemType = 'func' | 'device';
+
+interface Props {
+  functions: Function[];
+  devices: Device[];
+}
+
+class CanvasRenderer extends PureComponent<Props> {
   public fabricCanvas = new FabricCanvas();
 
   public componentDidMount() {
@@ -27,18 +32,32 @@ class TypesCreation extends PureComponent<{}> {
 
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    const { functions, devices } = this.props;
     const id = e.dataTransfer.getData('id');
+    const type = e.dataTransfer.getData('type') as DraggbleItemType;
 
-    const { functions } = this.context as FunctionContextType;
-    const droppedFunction = functions.find(func => func.id === id);
-    if (droppedFunction) {
-      const modifiedFunctions = {
-        name: droppedFunction.name,
-        numberOfInputs: droppedFunction.inputs.length,
-        numberOfOutputs: droppedFunction.outputs.length,
-        id: droppedFunction.id,
-      };
-      this.fabricCanvas.addNodes(modifiedFunctions, { x: e.pageX, y: e.pageY });
+    if (type === 'func') {
+      const droppedFunction = functions.find(func => func.id === id);
+      if (droppedFunction) {
+        const modifiedFunctions = {
+          name: droppedFunction.name,
+          numberOfInputs: droppedFunction.inputs.length,
+          numberOfOutputs: droppedFunction.outputs.length,
+          id: droppedFunction.id,
+        };
+        this.fabricCanvas.addNodes(modifiedFunctions, {
+          x: e.pageX,
+          y: e.pageY,
+        });
+      }
+    } else {
+      const droppedDevice = devices.find(func => func.id === id);
+      if (droppedDevice) {
+        this.fabricCanvas.addNodes(droppedDevice, {
+          x: e.pageX,
+          y: e.pageY,
+        });
+      }
     }
   };
 
@@ -55,6 +74,4 @@ class TypesCreation extends PureComponent<{}> {
   }
 }
 
-export default TypesCreation;
-
-TypesCreation.contextType = FunctionsContext;
+export default CanvasRenderer;
