@@ -48,7 +48,11 @@ class FabricController {
     );
   }
 
-  public addNodes = (func: FunctionType, position: PositionType) => {
+  public addNodes = (
+    func: FunctionType,
+    position: PositionType,
+    isDevice: boolean
+  ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
     this.addInputs(numberOfInputs, groupId, position);
@@ -57,6 +61,7 @@ class FabricController {
       name,
       data: { id, nodeId: groupId },
       position,
+      isDevice,
     });
   };
 

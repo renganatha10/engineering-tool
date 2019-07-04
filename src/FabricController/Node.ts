@@ -14,10 +14,18 @@ interface AddArgs {
   name: string;
   data: Nodedata;
   position: PositionType;
+  isDevice: boolean;
 }
 interface PositionType {
   x: number;
   y: number;
+}
+
+interface AddToGroupArgs {
+  nodes: fabric.Object[];
+  x: number;
+  y: number;
+  data: any;
 }
 
 class Node {
@@ -38,9 +46,9 @@ class Node {
     this._connection = connection;
     this._nodes = [];
   }
-  public add({ name, data, position }: AddArgs) {
+  public add({ name, data, position, isDevice }: AddArgs) {
     const rect = new fabric.Rect({
-      stroke: 'black',
+      stroke: isDevice ? 'transparent' : 'black',
       fill: 'transparent',
       height: RECT_SIZE,
       width: RECT_SIZE,
@@ -50,13 +58,38 @@ class Node {
 
     const text = new fabric.Text(name, {
       fontSize: 20,
+      top: isDevice ? -(RECT_SIZE / 2) + 10 : 0,
+      left: 0,
+      textAlign: 'center',
       originX: 'center',
       originY: 'center',
     });
 
     const { x, y } = position;
 
-    const group = new fabric.Group([rect, text], {
+    if (isDevice) {
+      fabric.Image.fromURL(
+        'assets/motor.png',
+        image => {
+          const nodes = [rect, image, text];
+          this._addToGroup({ nodes, x, y, data });
+        },
+        {
+          top: 20,
+          originX: 'center',
+          originY: 'center',
+          scaleX: (RECT_SIZE - 20) / 512,
+          scaleY: (RECT_SIZE - 20) / 512,
+        }
+      );
+    } else {
+      const nodes = [rect, text];
+      this._addToGroup({ nodes, x, y, data });
+    }
+  }
+
+  private _addToGroup = ({ nodes, x, y, data }: AddToGroupArgs) => {
+    const group = new fabric.Group(nodes, {
       left: x,
       top: y,
       data,
@@ -69,7 +102,7 @@ class Node {
     this._canvas.add(group);
 
     group.on('moving', this.onNodeMoving);
-  }
+  };
 
   public remove(group: fabric.Group) {
     group.off('moving', this.onNodeMoving);

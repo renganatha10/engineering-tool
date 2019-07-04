@@ -36,6 +36,8 @@ class CanvasRenderer extends PureComponent<Props> {
     const id = e.dataTransfer.getData('id');
     const type = e.dataTransfer.getData('type') as DraggbleItemType;
 
+    const isDevice = type === 'device';
+
     if (type === 'func') {
       const droppedFunction = functions.find(func => func.id === id);
       if (droppedFunction) {
@@ -45,18 +47,26 @@ class CanvasRenderer extends PureComponent<Props> {
           numberOfOutputs: droppedFunction.outputs.length,
           id: droppedFunction.id,
         };
-        this.fabricCanvas.addNodes(modifiedFunctions, {
-          x: e.pageX,
-          y: e.pageY,
-        });
+        this.fabricCanvas.addNodes(
+          modifiedFunctions,
+          {
+            x: e.pageX,
+            y: e.pageY,
+          },
+          isDevice
+        );
       }
     } else {
       const droppedDevice = devices.find(func => func.id === id);
       if (droppedDevice) {
-        this.fabricCanvas.addNodes(droppedDevice, {
-          x: e.pageX,
-          y: e.pageY,
-        });
+        this.fabricCanvas.addNodes(
+          droppedDevice,
+          {
+            x: e.pageX,
+            y: e.pageY,
+          },
+          isDevice
+        );
       }
     }
   };

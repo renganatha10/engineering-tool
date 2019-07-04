@@ -19,14 +19,14 @@ class Output implements ISource {
 
   public onMouseOver = (option: fabric.IEvent) => {
     if (option.target) {
-      option.target.setColor('green');
+      option.target.setColor('black');
       this._canvas.requestRenderAll();
     }
   };
 
   public onMouseOut = (option: fabric.IEvent) => {
     if (option.target) {
-      option.target.setColor('black');
+      option.target.setColor('red');
       this._canvas.requestRenderAll();
     }
   };
