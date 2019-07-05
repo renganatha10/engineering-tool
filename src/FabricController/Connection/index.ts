@@ -42,7 +42,10 @@ class Connection {
 
   public remove(line: fabric.Line) {
     this._canvas.remove(line);
-    // TODO: Remove from Connection List
+    this.connections = this.connections.filter(
+      connection => connection.data.id !== line.data.id
+    );
+
     this._currentLine = null;
   }
 
@@ -54,6 +57,7 @@ class Connection {
         ...toData,
       },
     });
+
     this.connections.push(line);
     this._currentLine = null;
   }

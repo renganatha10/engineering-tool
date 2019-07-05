@@ -39,7 +39,12 @@ class Input implements ISource {
   };
 
   public remove(circle: fabric.Circle) {
-    // TODO: Remove from Input List
+    circle.off('mouseover', this.onMouseOver);
+    circle.off('mouseout', this.onMouseOut);
+
+    this.inputs = this.inputs.filter(
+      input => input.data.nodeId !== circle.data.nodeId
+    );
     this._canvas.remove(circle);
   }
 }

@@ -33,6 +33,7 @@ class Node {
   private _input: Input;
   private _output: Output;
   public _connection: Connection;
+  public selectedNodeId: string;
   private _nodes: fabric.Group[];
   public constructor(
     canvas: fabric.Canvas,
@@ -45,6 +46,8 @@ class Node {
     this._output = output;
     this._connection = connection;
     this._nodes = [];
+    this.selectedNodeId = '';
+    document.addEventListener('keydown', this.onKeyPress);
   }
   public add({ name, data, position, isDevice }: AddArgs) {
     const rect = new fabric.Rect({
@@ -96,18 +99,33 @@ class Node {
       name: 'functionBlock',
       hasControls: false,
       hasBorders: false,
+      selectable: true,
     });
 
     this._nodes.push(group);
     this._canvas.add(group);
 
     group.on('moving', this.onNodeMoving);
+    group.on('mousedblclick', this.onNodeDoubleClick);
+  };
+
+  public onNodeDoubleClick = (option: fabric.IEvent) => {
+    if (option && option.target) {
+      const { data } = option.target;
+      this.selectedNodeId = data.nodeId;
+      option.target.hasBorders = true;
+      this._canvas.requestRenderAll();
+    }
   };
 
   public remove(group: fabric.Group) {
     group.off('moving', this.onNodeMoving);
-
+    group.off('mousedblclick', this.onNodeDoubleClick);
     // TODO: Remove from Node List
+
+    this._nodes = this._nodes.filter(
+      node => node.data.nodeId === group.data.nodeId
+    );
     this._canvas.remove(group);
   }
 
@@ -115,7 +133,7 @@ class Node {
     if (option.target) {
       const { target } = option;
       const { nodeId } = option.target.data as { nodeId: string };
-
+      this._removeBorders();
       const fromLines = this._connection.connections.filter(
         line => line.data.fromGroupId === nodeId
       );
@@ -170,6 +188,61 @@ class Node {
         circle.setCoords();
       });
     }
+  };
+
+  public onKeyPress = (e: KeyboardEvent) => {
+    const { key } = e;
+    if (key === 'Backspace') {
+      const selectedNode = this._nodes.find(
+        node => node.data.nodeId === this.selectedNodeId
+      );
+
+      if (selectedNode) {
+        this.remove(selectedNode);
+      }
+
+      const fromLines = this._connection.connections.filter(
+        line => line.data.fromGroupId === this.selectedNodeId
+      );
+
+      fromLines.forEach(line => this._connection.remove(line));
+
+      const toLines = this._connection.connections.filter(
+        line => line.data.toGroupId === this.selectedNodeId
+      );
+
+      toLines.forEach(line => this._connection.remove(line));
+
+      const inputCircles = this._input.inputs.filter(
+        input => input.data.groupId === this.selectedNodeId
+      );
+
+      inputCircles.forEach(line => this._input.remove(line));
+
+      const outputCircles = this._output.outputs.filter(
+        output => output.data.groupId === this.selectedNodeId
+      );
+
+      outputCircles.forEach(line => this._output.remove(line));
+      this.selectedNodeId = '';
+    } else if (key === 'Escape') {
+      this._removeBorders();
+    }
+  };
+
+  private _removeBorders = () => {
+    const selectedNode = this._nodes.find(
+      node => node.data.nodeId === this.selectedNodeId
+    );
+
+    if (selectedNode) {
+      if (selectedNode.hasBorders) {
+        selectedNode.hasBorders = false;
+        this._canvas.requestRenderAll();
+      }
+    }
+
+    this.selectedNodeId = '';
   };
 
   private _getInputOutPutXY = (
