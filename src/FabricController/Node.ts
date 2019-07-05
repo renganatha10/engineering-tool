@@ -121,10 +121,8 @@ class Node {
   public remove(group: fabric.Group) {
     group.off('moving', this.onNodeMoving);
     group.off('mousedblclick', this.onNodeDoubleClick);
-    // TODO: Remove from Node List
-
     this._nodes = this._nodes.filter(
-      node => node.data.nodeId === group.data.nodeId
+      node => node.data.nodeId !== group.data.nodeId
     );
     this._canvas.remove(group);
   }
