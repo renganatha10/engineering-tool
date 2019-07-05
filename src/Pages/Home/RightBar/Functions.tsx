@@ -1,7 +1,8 @@
 import React from 'react';
-import DraggbleItem from './../../../Components/DraggableItem';
 
-interface DeviceType {
+import FunctionBlock from '../../../Components/DraggableItem';
+
+interface FunctionType {
   name: string;
   numberOfInputs: number;
   numberOfOutputs: number;
@@ -9,16 +10,16 @@ interface DeviceType {
 }
 
 interface Props {
-  data: DeviceType[];
+  data: FunctionType[];
 }
 
-const Devices = (props: Props) => {
+const Functions = (props: Props) => {
   const { data } = props;
   return (
     <div>
       {data.map(item => (
-        <DraggbleItem
-          type={'device'}
+        <FunctionBlock
+          type={'func'}
           id={item.id}
           key={item.id}
           name={item.name}
@@ -28,4 +29,4 @@ const Devices = (props: Props) => {
   );
 };
 
-export default Devices;
+export default Functions;

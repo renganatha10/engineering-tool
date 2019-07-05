@@ -2,15 +2,15 @@ import React, { PureComponent } from 'react';
 import { Skeleton } from 'antd';
 import styled from 'styled-components';
 
-import FunctionProvoider from './../../Contexts/FunctionStoreContext';
+import FunctionProvoider from '../../Contexts/FunctionStoreContext';
 import FunctionsProvoider, {
   FunctionsContext,
   Function,
-} from './../../Contexts/FunctionsStoreContext';
+} from '../../Contexts/FunctionsStoreContext';
 import DevicesProvoider, {
   DevicesContext,
   Device,
-} from './../../Contexts/DevicesContext';
+} from '../../Contexts/DevicesContext';
 
 import Canvas from './Canvas';
 import RightBar from './RightBar';

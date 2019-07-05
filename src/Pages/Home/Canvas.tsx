@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
-import FabricCanvas from './../../FabricController';
+import FabricCanvas from '../../FabricController';
 
-import { Device } from './../../Contexts/DevicesContext';
-import { Function } from './../../Contexts/FunctionsStoreContext';
+import { Device } from '../../Contexts/DevicesContext';
+import { Function } from '../../Contexts/FunctionsStoreContext';
 
 const CanvasWrapper = styled.div`
   position: absolute;

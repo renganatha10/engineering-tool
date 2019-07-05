@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 
-import { DevicesContext } from './../../../Contexts/DevicesContext';
+import { DevicesContext } from '../../../Contexts/DevicesContext';
 
 import DeviceCreation from './DeviceCreationModal';
 import Devices from './Devices';

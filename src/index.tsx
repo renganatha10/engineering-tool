@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import GlobalStyles from './Utils/globalStyles';
 
-import App from './Pages/TypesCreation';
+import App from './Pages/Home';
 
 ReactDOM.render(
   <React.Fragment>

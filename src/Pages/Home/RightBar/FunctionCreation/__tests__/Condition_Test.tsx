@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, cleanup, fireEvent } from '@testing-library/react';
-import Condition from './../Condition';
+import Condition from '../Condition';
 
 afterEach(cleanup);
 

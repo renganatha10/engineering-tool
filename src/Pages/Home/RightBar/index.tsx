@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { Button } from 'antd';
 import uuid from 'uuid/v4';
 
-import { FunctionContext } from './../../../Contexts/FunctionStoreContext';
-import { FunctionsContext } from './../../../Contexts/FunctionsStoreContext';
+import { FunctionContext } from '../../../Contexts/FunctionStoreContext';
+import { FunctionsContext } from '../../../Contexts/FunctionsStoreContext';
 
-import FunctionCreation from './../../FunctionCreation';
+import FunctionCreation from './FunctionCreation';
 import Functions from './Functions';
 
 const RightBarWrapper = styled.div`

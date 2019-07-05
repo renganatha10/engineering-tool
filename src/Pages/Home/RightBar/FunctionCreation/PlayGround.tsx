@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import { FunctionContext } from '../../Contexts/FunctionStoreContext';
+import { FunctionContext } from '../../../../Contexts/FunctionStoreContext';
 import InputOutputBtn from './InputOutput';
 import Condition from './Condition';
 import State from './State';
