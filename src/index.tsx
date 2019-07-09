@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import GlobalStyles from './Utils/globalStyles';
+import GlobalStyles from './utils/globalStyles';
 
 import App from './Pages/Home';
 

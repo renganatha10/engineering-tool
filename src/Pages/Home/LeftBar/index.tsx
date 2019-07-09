@@ -29,8 +29,8 @@ const ButtonContainer = styled.div`
 `;
 
 interface Device {
-  numberOfInputs: number;
-  numberOfOutputs: number;
+  inputs: string[];
+  outputs: string[];
   id: string;
   name: string;
 }
