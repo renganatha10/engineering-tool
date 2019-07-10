@@ -6,8 +6,8 @@ import uuid from 'uuid/v1';
 import DeviceCreationForm from './DeviceCreationForm';
 
 interface Device {
-  numberOfInputs: number;
-  numberOfOutputs: number;
+  inputs: string[];
+  outputs: string[];
   id: string;
   name: string;
 }
@@ -20,8 +20,8 @@ interface Props {
 
 interface FormValues {
   username: string;
-  inputnumber: number;
-  outputnumber: number;
+  keysInput: string[];
+  keysOutput: string[];
 }
 
 class DeviceCreationModal extends React.PureComponent<Props> {
@@ -39,11 +39,11 @@ class DeviceCreationModal extends React.PureComponent<Props> {
         if (err) {
           return;
         }
-        const { inputnumber, outputnumber, username } = values;
+        const { keysInput: inputs, keysOutput: outputs, username } = values;
         const newDevice = {
-          numberOfOutputs: outputnumber,
+          outputs: outputs,
           id: uuid(),
-          numberOfInputs: inputnumber,
+          inputs: inputs,
           name: username,
         };
         onCreate(newDevice);

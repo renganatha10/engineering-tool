@@ -3,8 +3,8 @@ import DraggbleItem from '../../../Components/DraggableItem';
 
 interface DeviceType {
   name: string;
-  numberOfInputs: number;
-  numberOfOutputs: number;
+  inputs: string[];
+  outputs: string[];
   id: string;
 }
 
