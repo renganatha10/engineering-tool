@@ -1,4 +1,7 @@
 import { fabric } from 'fabric';
+
+import eventEmitter from '../utils/eventListener';
+
 import Input from './Source/Input';
 import Output from './Source/Output';
 import Connection from './Connection';
@@ -105,8 +108,39 @@ class Node {
     this._nodes.push(group);
     this._canvas.add(group);
 
+    // Create Another Function called as Moved.
+    // Emit the Events to Update the latest position of Node, Input, Output, Connection
+
     group.on('moving', this.onNodeMoving);
     group.on('mousedblclick', this.onNodeDoubleClick);
+    group.on('moved', this.onMoved);
+  };
+
+  public onMoved = (option: fabric.IEvent) => {
+    // if (option.target) {
+    //   const { nodeId } = option.target.data as { nodeId: string };
+
+    //   const fromLines = this._connection.connections.filter(
+    //     line => line.data.fromGroupId === nodeId
+    //   );
+
+    //   const toLines = this._connection.connections.filter(
+    //     line => line.data.toGroupId === nodeId
+    //   );
+
+    //   const inputCircles = this._input.inputs.filter(
+    //     input => input.data.groupId === nodeId
+    //   );
+
+    //   console.log(inputCircles, 'input circles');
+
+    //   const outputCircles = this._output.outputs.filter(
+    //     output => output.data.groupId === nodeId
+    //   );
+
+    //   console.log(outputCircles, 'output circles');
+    // }
+    eventEmitter.emitEvent('NODE_MOVED', [option]);
   };
 
   public onNodeDoubleClick = (option: fabric.IEvent) => {
@@ -121,6 +155,7 @@ class Node {
   public remove(group: fabric.Group) {
     group.off('moving', this.onNodeMoving);
     group.off('mousedblclick', this.onNodeDoubleClick);
+    group.off('moved', this.onMoved);
     this._nodes = this._nodes.filter(
       node => node.data.nodeId !== group.data.nodeId
     );

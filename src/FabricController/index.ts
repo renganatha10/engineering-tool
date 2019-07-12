@@ -1,6 +1,8 @@
 import { fabric } from 'fabric';
 import uuid from 'uuid/v4';
 
+import eventEmitter from '../utils/eventListener';
+
 import Node from './Node';
 import Input from './Source/Input';
 import Output from './Source/Output';
@@ -32,11 +34,16 @@ class FabricController {
   //@ts-ignore
   private _connectionController: Connection;
 
-  public init() {
+  public init(canvasObjects: fabric.Object[]) {
     this._canvas = new fabric.Canvas('c', { selection: false });
+    if (canvasObjects.length > 0) {
+      this._canvas.loadFromJSON({ objects: canvasObjects }, () => {});
+    } else {
+      this._addGrids();
+    }
+
     this._canvas.on('mouse:up', this.onCanvasMouseUp);
     this._canvas.on('mouse:down', this.onCanvasMouseDown);
-    this._addGrids();
     this._inputController = new Input(this._canvas);
     this._outputController = new Output(this._canvas);
     this._connectionController = new Connection(this._canvas);
@@ -48,6 +55,8 @@ class FabricController {
     );
   }
 
+  public getCanvas = () => this._canvas;
+
   public addNodes = (
     func: FunctionType,
     position: PositionType,
@@ -55,6 +64,8 @@ class FabricController {
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
+
+    this._canvas.getObjects();
     this.addInputs(numberOfInputs, groupId, position);
     this.addOutputs(numberOfOutputs, groupId, position);
     this._nodeController.add({
@@ -63,6 +74,11 @@ class FabricController {
       position,
       isDevice,
     });
+
+    // Make the Event Emitter to Add the Inputs, Outputs, Connections
+    eventEmitter.emitEvent('ADD_NODES', [
+      { name, data: { id, nodeId: groupId }, position, isDevice },
+    ]);
   };
 
   public addInputs = (

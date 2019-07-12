@@ -1,4 +1,7 @@
 import { fabric } from 'fabric';
+
+import eventEmitter from '../../utils/eventListener';
+
 import CurvedLine from './CurvedLink';
 
 interface Port {
@@ -57,6 +60,9 @@ class Connection {
         ...toData,
       },
     });
+
+    // Emit a Event new line has been created
+    eventEmitter.emitEvent('LINE_CREATED', [line]);
 
     this.connections.push(line);
     this._currentLine = null;

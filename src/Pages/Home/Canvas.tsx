@@ -21,13 +21,37 @@ type DraggbleItemType = 'func' | 'device';
 interface Props {
   functions: Function[];
   devices: Device[];
+  // canvasObjects: fabric.Object[];
+  updatePageObjects?: (objects: fabric.Object[]) => void;
+  currentPageId: string;
 }
 
-class CanvasRenderer extends PureComponent<Props> {
+interface State {
+  prevPageId: string;
+}
+
+class CanvasRenderer extends PureComponent<Props, State> {
+  public constructor(props: Props) {
+    super(props);
+    const { currentPageId } = this.props;
+    this.state = {
+      prevPageId: currentPageId,
+    };
+  }
   public fabricCanvas = new FabricCanvas();
 
   public componentDidMount() {
-    this.fabricCanvas.init();
+    this.fabricCanvas.init([]);
+  }
+
+  public componentDidUpdate() {
+    const { prevPageId } = this.state;
+    const { currentPageId } = this.props;
+
+    if (prevPageId !== currentPageId) {
+      this.fabricCanvas.getCanvas().clear();
+      this.setState({ prevPageId: currentPageId });
+    }
   }
 
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
