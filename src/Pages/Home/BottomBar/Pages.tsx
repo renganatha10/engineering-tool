@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
 
-import { Page } from '../../../Contexts/PageContext';
+import { Page } from '../../../MobxStore/pages';
 
 interface Props {
-  page: Page;
+  page: typeof Page.Type;
   onChangeCurrentPageId: (id: string) => void;
-  currentPageId: string;
+  currentPageId?: string;
 }
 
 const Margin = styled.div`

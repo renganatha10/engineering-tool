@@ -9,13 +9,6 @@ interface Port {
   top: number;
 }
 
-interface FromData {
-  fromNodeId: string;
-  fromGroupId: string;
-  fromIndex: number;
-  id: string;
-}
-
 interface ToData {
   toGroupId: string;
   toNodeId: string;
@@ -61,8 +54,23 @@ class Connection {
       },
     });
 
-    // Emit a Event new line has been created
-    eventEmitter.emitEvent('LINE_CREATED', [line]);
+    const {
+      data: { id },
+      x1,
+      x2,
+      y1,
+      y2,
+      name,
+    } = line;
+
+    eventEmitter.emit('LINE_CREATED', {
+      id,
+      name,
+      position: { x1, y1, y2, x2 },
+      isDevice: false,
+      type: 'Line',
+      data,
+    });
 
     this.connections.push(line);
     this._currentLine = null;

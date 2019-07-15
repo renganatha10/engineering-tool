@@ -1,8 +1,6 @@
 import { fabric } from 'fabric';
 import uuid from 'uuid/v4';
 
-import eventEmitter from '../utils/eventListener';
-
 import Node from './Node';
 import Input from './Source/Input';
 import Output from './Source/Output';
@@ -65,7 +63,6 @@ class FabricController {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
 
-    this._canvas.getObjects();
     this.addInputs(numberOfInputs, groupId, position);
     this.addOutputs(numberOfOutputs, groupId, position);
     this._nodeController.add({
@@ -74,11 +71,6 @@ class FabricController {
       position,
       isDevice,
     });
-
-    // Make the Event Emitter to Add the Inputs, Outputs, Connections
-    eventEmitter.emitEvent('ADD_NODES', [
-      { name, data: { id, nodeId: groupId }, position, isDevice },
-    ]);
   };
 
   public addInputs = (

@@ -1,10 +1,14 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
+import { inject, observer } from 'mobx-react';
 
 import FabricCanvas from '../../FabricController';
 
 import { Device } from '../../Contexts/DevicesContext';
 import { Function } from '../../Contexts/FunctionsStoreContext';
+import PagesStore, { CanvasObject } from './../../MobxStore/pages';
+
+import eventEmitter from './../../utils/eventListener';
 
 const CanvasWrapper = styled.div`
   position: absolute;
@@ -21,9 +25,10 @@ type DraggbleItemType = 'func' | 'device';
 interface Props {
   functions: Function[];
   devices: Device[];
-  // canvasObjects: fabric.Object[];
-  updatePageObjects?: (objects: fabric.Object[]) => void;
-  currentPageId: string;
+}
+
+interface CanvasRendererProps extends Props {
+  pages: typeof PagesStore.Type;
 }
 
 interface State {
@@ -31,28 +36,22 @@ interface State {
 }
 
 class CanvasRenderer extends PureComponent<Props, State> {
-  public constructor(props: Props) {
-    super(props);
-    const { currentPageId } = this.props;
-    this.state = {
-      prevPageId: currentPageId,
-    };
-  }
   public fabricCanvas = new FabricCanvas();
+
+  public get injected() {
+    return this.props as CanvasRendererProps;
+  }
 
   public componentDidMount() {
     this.fabricCanvas.init([]);
+    eventEmitter.on('ADD_NODE', this.onAddNode);
   }
 
-  public componentDidUpdate() {
-    const { prevPageId } = this.state;
-    const { currentPageId } = this.props;
-
-    if (prevPageId !== currentPageId) {
-      this.fabricCanvas.getCanvas().clear();
-      this.setState({ prevPageId: currentPageId });
-    }
-  }
+  public onAddNode = (node: typeof CanvasObject.Type) => {
+    const { pages } = this.injected;
+    const { currentPageId } = pages;
+    currentPageId && currentPageId.addCanvasObject(node);
+  };
 
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -99,6 +98,10 @@ class CanvasRenderer extends PureComponent<Props, State> {
     e.preventDefault();
   };
 
+  public componentWillUnmount() {
+    eventEmitter.off('ADD_NODE', this.onAddNode);
+  }
+
   public render() {
     return (
       <CanvasWrapper onDragOver={this.onDragOver} onDrop={this.onDrop}>
@@ -108,4 +111,4 @@ class CanvasRenderer extends PureComponent<Props, State> {
   }
 }
 
-export default CanvasRenderer;
+export default inject('pages')(observer(CanvasRenderer));

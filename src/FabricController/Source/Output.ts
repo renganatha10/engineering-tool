@@ -1,4 +1,7 @@
 import { fabric } from 'fabric';
+
+import eventEmitter from './../../utils/eventListener';
+
 import { ISource } from './index';
 
 class Output implements ISource {
@@ -15,6 +18,15 @@ class Output implements ISource {
     circle.on('mouseout', this.onMouseOut);
     this._canvas.add(circle);
     this.outputs.push(circle);
+
+    eventEmitter.emit('ADD_NODE', {
+      id: options.data.nodeId,
+      name: options.name,
+      data: options.data,
+      position: { x: options.left, y: options.left },
+      isDevice: false,
+      type: 'Source',
+    });
   }
 
   public onMouseOver = (option: fabric.IEvent) => {

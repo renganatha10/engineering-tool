@@ -73,6 +73,15 @@ class Node {
 
     const { x, y } = position;
 
+    eventEmitter.emit('ADD_NODE', {
+      id: data.nodeId,
+      name,
+      position,
+      data,
+      isDevice,
+      type: 'Node',
+    });
+
     if (isDevice) {
       fabric.Image.fromURL(
         'assets/motor.png',

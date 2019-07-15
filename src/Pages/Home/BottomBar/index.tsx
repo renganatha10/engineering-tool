@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Button } from 'antd';
-import uuid from 'uuid/v1';
+import { observer, inject } from 'mobx-react';
+import uuid from 'uuid/v4';
 
-import { PagesContext } from '../../../Contexts/PageContext';
 import Pages from './Pages';
+
+import PagesStore from './../../../MobxStore/pages';
 
 const BottomBarWrapper = styled.div`
   left: 150px;
@@ -30,41 +32,50 @@ const ButtonContainer = styled.div`
   margin: 0px 5px 0px 5px;
 `;
 
-const BottomBar = () => {
-  const {
-    pages,
-    onAddingPage,
-    onChangeCurrentPageId,
-    currentPageId,
-  } = useContext(PagesContext);
+interface Props {
+  pages: typeof PagesStore.Type;
+}
 
-  const addPage = () => {
-    const newPage = {
-      id: uuid(),
-      name: `Page ${pages.length + 1}`,
-      context: [],
-    };
-    onAddingPage && onAddingPage(newPage);
+class BottomBar extends React.Component<{}> {
+  public get injected() {
+    return this.props as Props;
+  }
+
+  public _addPage = () => {
+    const {
+      pages: { addPage, pages },
+    } = this.injected;
+    addPage({ id: uuid(), name: `Page ${pages.length + 1}` });
   };
 
-  return (
-    <BottomBarWrapper>
-      <PageContainer>
-        {onChangeCurrentPageId &&
-          pages.map(page => (
+  public render() {
+    const {
+      pages: { pages, currentPageId, changeCurrentPage },
+    } = this.injected;
+
+    return (
+      <BottomBarWrapper>
+        <PageContainer>
+          {pages.map(page => (
             <Pages
               key={page.id}
               page={page}
-              currentPageId={currentPageId}
-              onChangeCurrentPageId={onChangeCurrentPageId}
+              currentPageId={currentPageId ? currentPageId.id : ''}
+              onChangeCurrentPageId={changeCurrentPage}
             />
           ))}
-      </PageContainer>
-      <ButtonContainer>
-        <Button onClick={addPage} type="primary" shape="circle" icon="plus" />
-      </ButtonContainer>
-    </BottomBarWrapper>
-  );
-};
+        </PageContainer>
+        <ButtonContainer>
+          <Button
+            onClick={this._addPage}
+            type="primary"
+            shape="circle"
+            icon="plus"
+          />
+        </ButtonContainer>
+      </BottomBarWrapper>
+    );
+  }
+}
 
-export default BottomBar;
+export default inject('pages')(observer(BottomBar));
