@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { inject, observer } from 'mobx-react';
 
@@ -20,6 +20,10 @@ const CanvasWrapper = styled.div`
   background-color: #8bc34a1c;
 `;
 
+const InvisibleDiv = styled.div`
+  display: none;
+`;
+
 type DraggbleItemType = 'func' | 'device';
 
 interface Props {
@@ -35,16 +39,39 @@ interface State {
   prevPageId: string;
 }
 
-class CanvasRenderer extends PureComponent<Props, State> {
+class CanvasRenderer extends Component<Props, State> {
   public fabricCanvas = new FabricCanvas();
+  public previousPageId = '';
 
   public get injected() {
     return this.props as CanvasRendererProps;
   }
 
   public componentDidMount() {
-    this.fabricCanvas.init([]);
+    const {
+      pages: { currentPageId },
+    } = this.injected;
+    this.fabricCanvas.init();
+
+    if (currentPageId) {
+      this.previousPageId = currentPageId.id;
+      const loadedCanvasObjects = currentPageId.canvasObjects.toJS();
+      this.fabricCanvas.loadFromSavedCanvasObjects(loadedCanvasObjects);
+    }
     eventEmitter.on('ADD_NODE', this.onAddNode);
+  }
+
+  public componentDidUpdate() {
+    const { pages } = this.props as CanvasRendererProps;
+    const { currentPageId } = pages;
+
+    if (currentPageId) {
+      if (currentPageId.id !== this.previousPageId) {
+        this.previousPageId = currentPageId.id;
+        const loadedCanvasObjects = currentPageId.canvasObjects.toJS();
+        this.fabricCanvas.loadFromSavedCanvasObjects(loadedCanvasObjects);
+      }
+    }
   }
 
   public onAddNode = (node: typeof CanvasObject.Type) => {
@@ -75,6 +102,7 @@ class CanvasRenderer extends PureComponent<Props, State> {
           {
             x: e.pageX,
             y: e.pageY,
+            type: 'Node',
           },
           isDevice
         );
@@ -87,6 +115,7 @@ class CanvasRenderer extends PureComponent<Props, State> {
           {
             x: e.pageX,
             y: e.pageY,
+            type: 'Node',
           },
           isDevice
         );
@@ -103,8 +132,11 @@ class CanvasRenderer extends PureComponent<Props, State> {
   }
 
   public render() {
+    const { pages } = this.injected;
+    const { currentPageId } = pages;
     return (
       <CanvasWrapper onDragOver={this.onDragOver} onDrop={this.onDrop}>
+        <InvisibleDiv>{currentPageId ? currentPageId.id : ''}</InvisibleDiv>
         <canvas id="c" width="2000" height="1300" />
       </CanvasWrapper>
     );

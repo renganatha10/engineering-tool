@@ -11,6 +11,9 @@ const RECT_SIZE = 120;
 interface Nodedata {
   id: string;
   nodeId: string;
+  numberOfInputs: number;
+  numberOfOutputs: number;
+  type: string;
 }
 
 interface AddArgs {
@@ -18,6 +21,7 @@ interface AddArgs {
   data: Nodedata;
   position: PositionType;
   isDevice: boolean;
+  isLoaded: boolean;
 }
 interface PositionType {
   x: number;
@@ -52,7 +56,7 @@ class Node {
     this.selectedNodeId = '';
     document.addEventListener('keydown', this.onKeyPress);
   }
-  public add({ name, data, position, isDevice }: AddArgs) {
+  public add({ name, data, position, isDevice, isLoaded }: AddArgs) {
     const rect = new fabric.Rect({
       stroke: isDevice ? 'transparent' : 'black',
       fill: 'transparent',
@@ -73,14 +77,16 @@ class Node {
 
     const { x, y } = position;
 
-    eventEmitter.emit('ADD_NODE', {
-      id: data.nodeId,
-      name,
-      position,
-      data,
-      isDevice,
-      type: 'Node',
-    });
+    if (!isLoaded) {
+      eventEmitter.emit('ADD_NODE', {
+        id: data.nodeId,
+        name,
+        position,
+        data,
+        isDevice,
+        type: 'Node',
+      });
+    }
 
     if (isDevice) {
       fabric.Image.fromURL(
@@ -126,30 +132,24 @@ class Node {
   };
 
   public onMoved = (option: fabric.IEvent) => {
-    // if (option.target) {
-    //   const { nodeId } = option.target.data as { nodeId: string };
-
-    //   const fromLines = this._connection.connections.filter(
-    //     line => line.data.fromGroupId === nodeId
-    //   );
-
-    //   const toLines = this._connection.connections.filter(
-    //     line => line.data.toGroupId === nodeId
-    //   );
-
-    //   const inputCircles = this._input.inputs.filter(
-    //     input => input.data.groupId === nodeId
-    //   );
-
-    //   console.log(inputCircles, 'input circles');
-
-    //   const outputCircles = this._output.outputs.filter(
-    //     output => output.data.groupId === nodeId
-    //   );
-
-    //   console.log(outputCircles, 'output circles');
-    // }
-    eventEmitter.emitEvent('NODE_MOVED', [option]);
+    if (option.target) {
+      // const { nodeId } = option.target.data as { nodeId: string };
+      // const fromLines = this._connection.connections.filter(
+      //   line => line.data.fromGroupId === nodeId
+      // );
+      // const toLines = this._connection.connections.filter(
+      //   line => line.data.toGroupId === nodeId
+      // );
+      // const inputCircles = this._input.inputs.filter(
+      //   input => input.data.groupId === nodeId
+      // );
+      // console.log(inputCircles, 'input circles');
+      // const outputCircles = this._output.outputs.filter(
+      //   output => output.data.groupId === nodeId
+      // );
+      // console.log(outputCircles, 'output circles');
+      // eventEmitter.emitEvent('NODE_MOVED', [option]);
+    }
   };
 
   public onNodeDoubleClick = (option: fabric.IEvent) => {

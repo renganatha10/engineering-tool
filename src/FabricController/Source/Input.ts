@@ -12,21 +12,23 @@ class Input implements ISource {
     this.inputs = [];
   }
 
-  public add(options: fabric.ICircleOptions) {
+  public add(options: fabric.ICircleOptions, isLoaded: boolean) {
     const circle = new fabric.Circle(options);
     circle.on('mouseover', this.onMouseOver);
     circle.on('mouseout', this.onMouseOut);
     this._canvas.add(circle);
     this.inputs.push(circle);
 
-    eventEmitter.emit('ADD_NODE', {
-      id: options.data.nodeId,
-      name: options.name,
-      data: options.data,
-      position: { x: options.left, y: options.left },
-      isDevice: false,
-      type: 'Source',
-    });
+    if (!isLoaded) {
+      eventEmitter.emit('ADD_NODE', {
+        id: options.data.nodeId,
+        name: options.name,
+        data: options.data,
+        position: { type: 'Input', x: options.left, y: options.top },
+        isDevice: false,
+        type: 'Input',
+      });
+    }
   }
 
   public onMouseOver = (option: fabric.IEvent) => {

@@ -5,7 +5,7 @@ export interface PageArg {
   name: string;
 }
 
-const CanvasLineData = types.model('CanvasLineData', {
+export const CanvasLineData = types.model('CanvasLineData', {
   toGroupId: types.string,
   toNodeId: types.string,
   toIndex: types.number,
@@ -13,30 +13,37 @@ const CanvasLineData = types.model('CanvasLineData', {
   fromGroupId: types.string,
   fromIndex: types.number,
   id: types.string,
+  type: 'Line',
 });
 
-const CanvasNodeData = types.model('CanvasNodeData', {
+export const CanvasNodeData = types.model('CanvasNodeData', {
   id: types.string,
   nodeId: types.string,
+  numberOfInputs: types.number,
+  numberOfOutputs: types.number,
+  type: 'Node',
 });
 
-const CanvasSourceData = types.model('CanvasSourceData', {
+export const CanvasSourceData = types.model('CanvasSourceData', {
   index: types.number,
   nodeId: types.string,
   groupId: types.string,
   y1Factor: types.number,
+  type: types.enumeration('type', ['Input', 'Output']),
 });
 
-const CanvasLinePosition = types.model('CanvasLinePosition', {
+export const CanvasLinePosition = types.model('CanvasLinePosition', {
   x1: types.number,
   x2: types.number,
   y1: types.number,
   y2: types.number,
+  type: 'Line',
 });
 
-const CanvasNodePosition = types.model('CanvasNodePosition', {
+export const CanvasNodePosition = types.model('CanvasNodePosition', {
   x: types.number,
   y: types.number,
+  type: types.enumeration('type', ['Node', 'Input', 'Output']),
 });
 
 export type PositionArgs =
@@ -48,9 +55,42 @@ export const CanvasObject = types
     id: types.identifier,
     name: types.string,
     isDevice: types.boolean,
-    type: types.enumeration('type', ['Node', 'Source', 'Line']),
-    position: types.union(CanvasLinePosition, CanvasNodePosition),
-    data: types.union(CanvasLineData, CanvasSourceData, CanvasNodeData),
+    type: types.enumeration('type', ['Node', 'Input', 'Output', 'Line']),
+    position: types.union(
+      {
+        dispatcher: data => {
+          switch (data.type) {
+            case 'Node':
+            case 'Input':
+            case 'Output': {
+              return CanvasNodePosition;
+            }
+            default:
+              return CanvasLinePosition;
+          }
+        },
+      },
+      CanvasLinePosition,
+      CanvasNodePosition
+    ),
+    data: types.union(
+      {
+        dispatcher: data => {
+          switch (data.type) {
+            case 'Node':
+              return CanvasNodeData;
+            case 'Input':
+            case 'Output':
+              return CanvasSourceData;
+            default:
+              return CanvasLineData;
+          }
+        },
+      },
+      CanvasLineData,
+      CanvasSourceData,
+      CanvasNodeData
+    ),
   })
   .actions(self => {
     const updateCanvasPosition = (position: PositionArgs) => {

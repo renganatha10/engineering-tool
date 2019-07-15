@@ -22,7 +22,7 @@ class App extends React.PureComponent<{}, State> {
   public constructor(props: {}) {
     super(props);
 
-    const pageStore = PagesStore.create({ pages: [], currentPageId: '' });
+    const pageStore = PagesStore.create(this.pagesInitialState);
     this.state = {
       pageStore,
       loading: true,
