@@ -39,6 +39,15 @@ interface State {
   prevPageId: string;
 }
 
+interface NodeMovedObject {
+  id: string;
+  position: {
+    x: number;
+    y: number;
+    type: 'Input' | 'Output' | 'Node';
+  };
+}
+
 class CanvasRenderer extends Component<Props, State> {
   public fabricCanvas = new FabricCanvas();
   public previousPageId = '';
@@ -59,6 +68,7 @@ class CanvasRenderer extends Component<Props, State> {
       this.fabricCanvas.loadFromSavedCanvasObjects(loadedCanvasObjects);
     }
     eventEmitter.on('ADD_NODE', this.onAddNode);
+    eventEmitter.on('NODE_MOVED', this.onNodeMoved);
   }
 
   public componentDidUpdate() {
@@ -73,6 +83,24 @@ class CanvasRenderer extends Component<Props, State> {
       }
     }
   }
+
+  public onNodeMoved = (nodes: NodeMovedObject[]) => {
+    const { pages } = this.injected;
+    const { currentPageId } = pages;
+
+    if (currentPageId) {
+      const currentPageCanvasObjects = currentPageId.canvasObjects;
+
+      nodes.forEach(node => {
+        const canvasObject = currentPageCanvasObjects.find(
+          item => item.id === node.id
+        );
+        if (canvasObject) {
+          canvasObject.updateCanvasPosition(node.position);
+        }
+      });
+    }
+  };
 
   public onAddNode = (node: typeof CanvasObject.Type) => {
     const { pages } = this.injected;
@@ -129,6 +157,7 @@ class CanvasRenderer extends Component<Props, State> {
 
   public componentWillUnmount() {
     eventEmitter.off('ADD_NODE', this.onAddNode);
+    eventEmitter.off('NODE_MOVED', this.onNodeMoved);
   }
 
   public render() {

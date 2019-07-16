@@ -123,9 +123,6 @@ class Node {
     this._nodes.push(group);
     this._canvas.add(group);
 
-    // Create Another Function called as Moved.
-    // Emit the Events to Update the latest position of Node, Input, Output, Connection
-
     group.on('moving', this.onNodeMoving);
     group.on('mousedblclick', this.onNodeDoubleClick);
     group.on('moved', this.onMoved);
@@ -133,22 +130,91 @@ class Node {
 
   public onMoved = (option: fabric.IEvent) => {
     if (option.target) {
-      // const { nodeId } = option.target.data as { nodeId: string };
-      // const fromLines = this._connection.connections.filter(
-      //   line => line.data.fromGroupId === nodeId
-      // );
-      // const toLines = this._connection.connections.filter(
-      //   line => line.data.toGroupId === nodeId
-      // );
-      // const inputCircles = this._input.inputs.filter(
-      //   input => input.data.groupId === nodeId
-      // );
-      // console.log(inputCircles, 'input circles');
-      // const outputCircles = this._output.outputs.filter(
-      //   output => output.data.groupId === nodeId
-      // );
-      // console.log(outputCircles, 'output circles');
-      // eventEmitter.emitEvent('NODE_MOVED', [option]);
+      const canvasObjects = [];
+
+      const {
+        data: { nodeId },
+        left,
+        top,
+      } = option.target;
+
+      canvasObjects.push({
+        id: nodeId,
+        position: { x: left, y: top, type: 'Node' },
+      });
+
+      const inputCircles = this._input.inputs.filter(
+        input => input.data.groupId === nodeId
+      );
+
+      inputCircles.forEach(circle => {
+        const {
+          data: { nodeId },
+          left,
+          top,
+        } = circle;
+
+        canvasObjects.push({
+          id: nodeId,
+          position: { x: left, y: top, type: 'Input' },
+        });
+      });
+
+      const outputCircles = this._output.outputs.filter(
+        output => output.data.groupId === nodeId
+      );
+
+      outputCircles.forEach(circle => {
+        const {
+          data: { nodeId },
+          left,
+          top,
+        } = circle;
+
+        canvasObjects.push({
+          id: nodeId,
+          position: { x: left, y: top, type: 'Input' },
+        });
+      });
+
+      const fromLines = this._connection.connections.filter(
+        line => line.data.fromGroupId === nodeId
+      );
+      const toLines = this._connection.connections.filter(
+        line => line.data.toGroupId === nodeId
+      );
+
+      toLines.forEach(item => {
+        const {
+          data: { id },
+          x1,
+          x2,
+          y1,
+          y2,
+        } = item;
+
+        canvasObjects.push({
+          id,
+          position: { x1, x2, y1, y2, type: 'Line' },
+        });
+      });
+
+      fromLines.forEach(item => {
+        const {
+          data: { id },
+          x1,
+          x2,
+          y1,
+          y2,
+        } = item;
+
+        canvasObjects.push({
+          id,
+          position: { x1, x2, y1, y2, type: 'Line' },
+        });
+      });
+
+      eventEmitter.emit('NODE_MOVED', canvasObjects);
     }
   };
 
@@ -270,6 +336,10 @@ class Node {
     } else if (key === 'Escape') {
       this._removeBorders();
     }
+  };
+
+  public clearAllNodes = () => {
+    this._nodes = [];
   };
 
   private _removeBorders = () => {

@@ -53,6 +53,10 @@ class Output implements ISource {
     );
     this._canvas.remove(circle);
   }
+
+  public clearAllOutputs = () => {
+    this.outputs = [];
+  };
 }
 
 export default Output;

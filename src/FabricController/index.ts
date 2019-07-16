@@ -5,6 +5,7 @@ import {
   CanvasObject,
   CanvasNodeData,
   CanvasNodePosition,
+  CanvasLinePosition,
 } from '../MobxStore/pages';
 import Node from './Node';
 import Input from './Source/Input';
@@ -58,6 +59,10 @@ class FabricController {
     canvasObjects: typeof CanvasObject.Type[]
   ) => {
     this._canvas.clear();
+    this._nodeController.clearAllNodes();
+    this._outputController.clearAllOutputs();
+    this._inputController.clearAllInputs();
+    this._connectionController.clearAllConnections();
     this._addGrids();
     canvasObjects.forEach(object => {
       if (object.type === 'Node') {
@@ -101,6 +106,25 @@ class FabricController {
           },
           true
         );
+      } else if (object.type === 'Line') {
+        const { name, data, position } = object;
+        const { x1, x2, y1, y2 } = position as typeof CanvasLinePosition.Type;
+        this._connectionController.loadFromLocal({
+          fill: '#999999',
+          stroke: '#999999',
+          originX: 'center',
+          originY: 'center',
+          selectable: false,
+          hasBorders: false,
+          hasControls: false,
+          evented: false,
+          x1,
+          x2,
+          y1,
+          y2,
+          data,
+          name,
+        });
       }
     });
   };
@@ -244,11 +268,15 @@ class FabricController {
           if (fromData.fromGroupId === groupId) {
             this._connectionController.remove(line);
           } else {
-            this._connectionController.makeConnection(line, {
-              toGroupId: groupId,
-              toNodeId: nodeId,
-              toIndex: index,
-            });
+            this._connectionController.makeConnection(
+              line,
+              {
+                toGroupId: groupId,
+                toNodeId: nodeId,
+                toIndex: index,
+              },
+              false
+            );
           }
         }
       }

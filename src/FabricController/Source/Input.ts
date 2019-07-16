@@ -54,6 +54,10 @@ class Input implements ISource {
     );
     this._canvas.remove(circle);
   }
+
+  public clearAllInputs = () => {
+    this.inputs = [];
+  };
 }
 
 export default Input;
