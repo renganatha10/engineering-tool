@@ -96,6 +96,7 @@ export const CanvasObject = types
     const updateCanvasPosition = (position: PositionArgs) => {
       self.position = position;
     };
+
     return {
       updateCanvasPosition,
     };
@@ -111,8 +112,17 @@ export const Page = types
     const addCanvasObject = (canvasObject: typeof CanvasObject.Type) => {
       self.canvasObjects.push(canvasObject);
     };
+    const deleteCanvasObject = (id: string) => {
+      const selectedCanvasObject = self.canvasObjects.find(
+        item => item.id === id
+      );
+      if (selectedCanvasObject) {
+        self.canvasObjects.remove(selectedCanvasObject);
+      }
+    };
     return {
       addCanvasObject,
+      deleteCanvasObject,
     };
   });
 

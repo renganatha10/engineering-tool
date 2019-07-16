@@ -301,11 +301,13 @@ class Node {
   public onKeyPress = (e: KeyboardEvent) => {
     const { key } = e;
     if (key === 'Backspace') {
+      const canvasObjectIds = [];
       const selectedNode = this._nodes.find(
         node => node.data.nodeId === this.selectedNodeId
       );
 
       if (selectedNode) {
+        canvasObjectIds.push(this.selectedNodeId);
         this.remove(selectedNode);
       }
 
@@ -313,26 +315,40 @@ class Node {
         line => line.data.fromGroupId === this.selectedNodeId
       );
 
-      fromLines.forEach(line => this._connection.remove(line));
+      fromLines.forEach(line => {
+        canvasObjectIds.push(line.data.id);
+        this._connection.remove(line);
+      });
 
       const toLines = this._connection.connections.filter(
         line => line.data.toGroupId === this.selectedNodeId
       );
 
-      toLines.forEach(line => this._connection.remove(line));
+      toLines.forEach(line => {
+        canvasObjectIds.push(line.data.id);
+        this._connection.remove(line);
+      });
 
       const inputCircles = this._input.inputs.filter(
         input => input.data.groupId === this.selectedNodeId
       );
 
-      inputCircles.forEach(line => this._input.remove(line));
+      inputCircles.forEach(line => {
+        canvasObjectIds.push(line.data.nodeId);
+        this._input.remove(line);
+      });
 
       const outputCircles = this._output.outputs.filter(
         output => output.data.groupId === this.selectedNodeId
       );
 
-      outputCircles.forEach(line => this._output.remove(line));
+      outputCircles.forEach(line => {
+        canvasObjectIds.push(line.data.nodeId);
+        this._output.remove(line);
+      });
       this.selectedNodeId = '';
+
+      eventEmitter.emit('NODE_DELETED', canvasObjectIds);
     } else if (key === 'Escape') {
       this._removeBorders();
     }

@@ -69,6 +69,7 @@ class CanvasRenderer extends Component<Props, State> {
     }
     eventEmitter.on('ADD_NODE', this.onAddNode);
     eventEmitter.on('NODE_MOVED', this.onNodeMoved);
+    eventEmitter.on('NODE_DELETED', this.onNodeDeleted);
   }
 
   public componentDidUpdate() {
@@ -83,6 +84,17 @@ class CanvasRenderer extends Component<Props, State> {
       }
     }
   }
+
+  public onNodeDeleted = (nodeIds: string[]) => {
+    const { pages } = this.props as CanvasRendererProps;
+    const { currentPageId } = pages;
+
+    if (currentPageId) {
+      nodeIds.forEach(nodeId => {
+        currentPageId.deleteCanvasObject(nodeId);
+      });
+    }
+  };
 
   public onNodeMoved = (nodes: NodeMovedObject[]) => {
     const { pages } = this.injected;
@@ -158,6 +170,7 @@ class CanvasRenderer extends Component<Props, State> {
   public componentWillUnmount() {
     eventEmitter.off('ADD_NODE', this.onAddNode);
     eventEmitter.off('NODE_MOVED', this.onNodeMoved);
+    eventEmitter.off('NODE_DELETED', this.onNodeDeleted);
   }
 
   public render() {
