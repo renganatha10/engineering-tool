@@ -39,13 +39,23 @@ interface State {
   prevPageId: string;
 }
 
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface SourcePosition extends Position {
+  type: 'Input' | 'Output';
+}
+
+interface NodePosition extends Position {
+  scale: number;
+  type: 'Node';
+}
+
 interface NodeMovedObject {
   id: string;
-  position: {
-    x: number;
-    y: number;
-    type: 'Input' | 'Output' | 'Node';
-  };
+  position: NodePosition | SourcePosition;
 }
 
 class CanvasRenderer extends Component<Props, State> {
@@ -142,6 +152,7 @@ class CanvasRenderer extends Component<Props, State> {
           {
             x: e.pageX,
             y: e.pageY,
+            scale: 1,
             type: 'Node',
           },
           isDevice
@@ -162,6 +173,7 @@ class CanvasRenderer extends Component<Props, State> {
           {
             x: e.pageX,
             y: e.pageY,
+            scale: 1,
             type: 'Node',
           },
           isDevice
