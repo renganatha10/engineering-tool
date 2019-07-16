@@ -1,10 +1,10 @@
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Button, Collapse } from 'antd';
+import { observer } from 'mobx-react';
 
-import { DevicesContext } from '../../../Contexts/DevicesContext';
+import DeviceStore from '../../../MobxStore/deviceStore';
 
-import DeviceStore from '../../../store/deviceStore';
 import DeviceCreation from './DeviceCreationModal';
 import Devices from './Devices';
 
@@ -39,16 +39,16 @@ interface Device {
   name: string;
 }
 
-interface Props {
-  deviceStore: typeof DeviceStore.Type;
+interface LeftBarProps {
+  devices: typeof DeviceStore.Type;
 }
 
-const LeftBar = (props: Props) => {
+const LeftBar = (props: LeftBarProps) => {
   const [isCreateDeviceVisible, toggleCreateDeviceVisible] = useState<boolean>(
     false
   );
-  const { devices, onAddingDevices } = useContext(DevicesContext);
-  const { deviceStore } = props;
+
+  const { devices } = props;
 
   const showDeviceCreation = useCallback(() => {
     toggleCreateDeviceVisible(true);
@@ -59,8 +59,7 @@ const LeftBar = (props: Props) => {
   }, []);
 
   const onDeviceCreate = (device: Device) => {
-    onAddingDevices && onAddingDevices(device);
-    deviceStore.addBasicDevice(device);
+    devices.addBasicDevice(device);
     toggleCreateDeviceVisible(false);
   };
 
@@ -86,17 +85,17 @@ const LeftBar = (props: Props) => {
       </ButtonContainer>
       <Collapse accordion>
         <Panel header="Basic Devices" key="1">
-          <Devices data={deviceStore.basicDevices.toJSON()} />
+          <Devices data={devices.basicDevices.toJSON()} />
         </Panel>
         <Panel header="Complex Devices" key="2">
-          <Devices data={devices} />
+          <Devices data={devices.basicDevices.toJSON()} />
         </Panel>
         <Panel header="Plant" key="3">
-          <Devices data={devices} />
+          <Devices data={devices.basicDevices.toJSON()} />
         </Panel>
       </Collapse>
     </LeftBarWrapper>
   );
 };
 
-export default LeftBar;
+export default observer(LeftBar);

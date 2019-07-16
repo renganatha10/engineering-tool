@@ -1,7 +1,6 @@
 import React from 'react';
 import { Form, Input, Select } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
-import styled from 'styled-components';
 
 interface DeviceType {
   name: string;
@@ -19,22 +18,6 @@ interface State {
 }
 
 const { Option } = Select;
-
-const HeaderTag = styled.h2`
-  flex: 0.2;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  display: flex;
-  font-size: 15px;
-`;
-
-const SelectWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 50px 0px 50px 0px;
-  width: 100%;
-`;
 
 class Plant extends React.PureComponent<FormComponentProps & Props, State> {
   public constructor(props: FormComponentProps & Props) {
@@ -62,7 +45,7 @@ class Plant extends React.PureComponent<FormComponentProps & Props, State> {
   public render() {
     const { form, data } = this.props;
     const { getFieldDecorator } = form;
-    const location = ['Bangalore', 'Chennai', 'Delhi', 'Kolkata'];
+    const location = ['Floor 1', 'Floor 2', 'Floor 3', 'Floor 4'];
 
     const deviceChildren = data.map(device => (
       <Option key={device.id}>{device.name}</Option>
@@ -90,30 +73,37 @@ class Plant extends React.PureComponent<FormComponentProps & Props, State> {
               ],
             })(<Input placeholder="Enter Plant Name" />)}
           </Form.Item>
+          <Form.Item label="Select Area :">
+            {getFieldDecorator('areas', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Select area',
+                  type: 'array',
+                },
+              ],
+            })(
+              <Select mode="multiple" placeholder="Select Area">
+                {locationChildren}
+              </Select>
+            )}
+          </Form.Item>
         </Form>
-        <SelectWrapper>
-          <HeaderTag>Select Plant Location :</HeaderTag>
-          <Select
-            mode="tags"
-            style={{ width: '30%' }}
-            placeholder="Select Areas"
-            onChange={this.handleDeviceChange}
-            tokenSeparators={[',']}
-          >
-            {locationChildren}
-          </Select>
-        </SelectWrapper>
-        <SelectWrapper>
-          <HeaderTag>Select Basic Devices :</HeaderTag>
-          <Select
-            mode="multiple"
-            style={{ width: '30%' }}
-            placeholder="Select Devices"
-            onChange={this.handleDeviceChange}
-          >
-            {deviceChildren}
-          </Select>
-        </SelectWrapper>
+        <Form.Item label="Select Devices">
+          {getFieldDecorator('basicDevicesId', {
+            rules: [
+              {
+                required: true,
+                message: 'Select basic devices',
+                type: 'array',
+              },
+            ],
+          })(
+            <Select mode="multiple" placeholder="Select Devices">
+              {deviceChildren}
+            </Select>
+          )}
+        </Form.Item>
       </div>
     );
   }

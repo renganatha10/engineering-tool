@@ -1,12 +1,8 @@
 import { fabric } from 'fabric';
-import { ISource } from './index';
 
-interface InputData {
-  index: number;
-  nodeId: string;
-  groupId: string;
-  y1Factor: number;
-}
+import eventEmitter from './../../utils/eventListener';
+
+import { ISource } from './index';
 
 class Input implements ISource {
   public inputs: fabric.Circle[];
@@ -16,12 +12,23 @@ class Input implements ISource {
     this.inputs = [];
   }
 
-  public add(options: fabric.ICircleOptions) {
+  public add(options: fabric.ICircleOptions, isLoaded: boolean) {
     const circle = new fabric.Circle(options);
     circle.on('mouseover', this.onMouseOver);
     circle.on('mouseout', this.onMouseOut);
     this._canvas.add(circle);
     this.inputs.push(circle);
+
+    if (!isLoaded) {
+      eventEmitter.emit('ADD_NODE', {
+        id: options.data.nodeId,
+        name: options.name,
+        data: options.data,
+        position: { type: 'Input', x: options.left, y: options.top },
+        isDevice: false,
+        type: 'Input',
+      });
+    }
   }
 
   public onMouseOver = (option: fabric.IEvent) => {
@@ -47,6 +54,10 @@ class Input implements ISource {
     );
     this._canvas.remove(circle);
   }
+
+  public clearAllInputs = () => {
+    this.inputs = [];
+  };
 }
 
 export default Input;

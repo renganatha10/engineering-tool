@@ -1,16 +1,12 @@
 import { fabric } from 'fabric';
+
+import eventEmitter from '../../utils/eventListener';
+
 import CurvedLine from './CurvedLink';
 
 interface Port {
   left: number;
   top: number;
-}
-
-interface FromData {
-  fromNodeId: string;
-  fromGroupId: string;
-  fromIndex: number;
-  id: string;
 }
 
 interface ToData {
@@ -49,7 +45,18 @@ class Connection {
     this._currentLine = null;
   }
 
-  public makeConnection(line: fabric.Line, toData: ToData) {
+  public loadFromLocal = (option: fabric.ILineOptions) => {
+    const { x1, x2, y1, y2 } = option;
+    const line = new CurvedLine(
+      { left: x1, top: y1 },
+      { left: x2, top: y2 },
+      option
+    );
+    this._canvas.add(line);
+    this.connections.push(line);
+  };
+
+  public makeConnection(line: fabric.Line, toData: ToData, isLoaded: false) {
     const { data } = line;
     line.set({
       data: {
@@ -58,9 +65,32 @@ class Connection {
       },
     });
 
+    const {
+      data: { id },
+      x1,
+      x2,
+      y1,
+      y2,
+    } = line;
+
+    if (!isLoaded) {
+      eventEmitter.emit('ADD_NODE', {
+        id,
+        name: 'Line',
+        position: { x1, y1, y2, x2, type: 'Line' },
+        isDevice: false,
+        type: 'Line',
+        data: { ...data, ...toData, type: 'Line' },
+      });
+    }
+
     this.connections.push(line);
     this._currentLine = null;
   }
+
+  public clearAllConnections = () => {
+    this.connections = [];
+  };
 }
 
 export default Connection;

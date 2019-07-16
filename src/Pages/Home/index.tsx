@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react';
 import { Skeleton } from 'antd';
 import styled from 'styled-components';
-import { Provider } from 'mobx-react';
-import { onSnapshot } from 'mobx-state-tree';
+import { inject, observer } from 'mobx-react';
 
-import DeviceStore from '../../store/deviceStore';
+import DeviceStore from '../../MobxStore/deviceStore';
 
 import FunctionProvoider from '../../Contexts/FunctionStoreContext';
 import FunctionsProvoider, {
@@ -19,6 +18,7 @@ import DevicesProvoider, {
 import Canvas from './Canvas';
 import RightBar from './RightBar';
 import LeftBar from './LeftBar';
+import BottomBar from './BottomBar';
 
 const HomeWrapper = styled.div`
   position: relative;
@@ -30,7 +30,10 @@ interface State {
   rehydrating: boolean;
   functions: Function[];
   devices: Device[];
-  deviceStore: typeof DeviceStore.Type;
+}
+
+interface LeftBarProps {
+  devices: typeof DeviceStore.Type;
 }
 
 class TypesCreation extends PureComponent<{}, State> {
@@ -40,11 +43,8 @@ class TypesCreation extends PureComponent<{}, State> {
       rehydrating: true,
       functions: [],
       devices: [],
-      deviceStore: DeviceStore.create(this.deviceInitialState),
     };
   }
-
-  public deviceInitialState = {};
 
   public componentDidMount() {
     this._loadPeristedItems();
@@ -54,17 +54,8 @@ class TypesCreation extends PureComponent<{}, State> {
     const stringfiedDevices = window.localStorage.getItem('devices');
     const stringfiedFunctions = window.localStorage.getItem('functions');
 
-    const deviceStoreRehydrated = window.localStorage.getItem('deviceStore');
-
     let functions = [];
     let devices = [];
-
-    let { deviceStore } = this.state;
-
-    if (deviceStoreRehydrated) {
-      this.deviceInitialState = JSON.parse(deviceStoreRehydrated);
-      deviceStore = DeviceStore.create(this.deviceInitialState);
-    }
 
     if (stringfiedFunctions) {
       try {
@@ -84,52 +75,51 @@ class TypesCreation extends PureComponent<{}, State> {
       }
     }
 
-    onSnapshot(deviceStore, snapShot =>
-      window.localStorage.setItem('deviceStore', JSON.stringify(snapShot))
-    );
-
     this.setState({
       rehydrating: false,
       functions,
       devices,
-      deviceStore,
     });
   };
 
+  public get injected() {
+    return this.props as LeftBarProps;
+  }
+
   public render() {
-    const { rehydrating, devices, functions, deviceStore } = this.state;
+    const { rehydrating, devices, functions } = this.state;
+    const { devices: storeDevices } = this.injected;
     if (rehydrating) {
       return <Skeleton active={rehydrating} />;
     }
 
     return (
-      <Provider deviceStore={deviceStore}>
-        <FunctionProvoider>
-          <FunctionsProvoider initFunctions={functions}>
-            <DevicesProvoider initDevices={devices}>
-              <HomeWrapper>
-                <FunctionsContext.Consumer>
-                  {({ functions }) => {
-                    return (
-                      <DevicesContext.Consumer>
-                        {({ devices }) => {
-                          return (
-                            <Canvas devices={devices} functions={functions} />
-                          );
-                        }}
-                      </DevicesContext.Consumer>
-                    );
-                  }}
-                </FunctionsContext.Consumer>
-                <LeftBar deviceStore={deviceStore} />
-                <RightBar />
-              </HomeWrapper>
-            </DevicesProvoider>
-          </FunctionsProvoider>
-        </FunctionProvoider>
-      </Provider>
+      <FunctionProvoider>
+        <FunctionsProvoider initFunctions={functions}>
+          <DevicesProvoider initDevices={devices}>
+            <HomeWrapper>
+              <FunctionsContext.Consumer>
+                {({ functions }) => {
+                  return (
+                    <DevicesContext.Consumer>
+                      {({ devices }) => {
+                        return (
+                          <Canvas devices={devices} functions={functions} />
+                        );
+                      }}
+                    </DevicesContext.Consumer>
+                  );
+                }}
+              </FunctionsContext.Consumer>
+              <LeftBar devices={storeDevices} />
+              <RightBar />
+              <BottomBar />
+            </HomeWrapper>
+          </DevicesProvoider>
+        </FunctionsProvoider>
+      </FunctionProvoider>
     );
   }
 }
 
-export default TypesCreation;
+export default inject('devices')(observer(TypesCreation));

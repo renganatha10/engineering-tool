@@ -1,10 +1,6 @@
 import React from 'react';
-import { Button, Select, Input } from 'antd';
+import { Select, Input, Form } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
-// import uuid from 'uuid/v1';
-import styled from 'styled-components';
-
-import DeviceCreationForm from './DeviceCreationForm';
 
 interface Device {
   inputs: string[];
@@ -13,15 +9,8 @@ interface Device {
   name: string;
 }
 
-interface FormValues {
-  username: string;
-  keysInput: string[];
-  keysOutput: string[];
-}
-
 interface Props {
   devices: Device[];
-  saveFormRef: (formRef: { props: FormComponentProps<FormValues> }) => void;
 }
 
 interface State {
@@ -32,98 +21,68 @@ interface State {
 
 const { Option } = Select;
 
-const SelectWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 50px 0px 50px 0px;
-  width: 100%;
-`;
-
-const HeaderTag = styled.h2`
-  flex: 0.2;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  display: flex;
-  font-size: 15px;
-`;
-
-const FlexWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 50px 0px 50px 0px;
-  width: 50%;
-`;
-
-class ComplexDeviceCreationModal extends React.PureComponent<Props, State> {
-  public constructor(props: Props) {
-    super(props);
-    this.state = {
-      name: '',
-      createBasicTypeClicked: false,
-      basicDevices: [],
-    };
-  }
-
-  public toggleCreateBasicButton = () => {
-    const { createBasicTypeClicked } = this.state;
-
-    this.setState({ createBasicTypeClicked: !createBasicTypeClicked });
+class ComplexDeviceCreationForm extends React.PureComponent<
+  FormComponentProps & Props,
+  State
+> {
+  public handleSubmit = (e: any) => {
+    e.preventDefault();
   };
 
-  public handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ name: e.target.value });
-  };
-
-  public handleChange = (value: string[]) => {
-    this.setState({ basicDevices: value });
+  public normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
   };
 
   public render() {
-    const { createBasicTypeClicked, name } = this.state;
-    //@ts-ignore
-    const { devices, saveFormRef } = this.props;
+    const { devices, form } = this.props;
+    const { getFieldDecorator } = form;
+
+    const formItemLayout = {
+      labelCol: { span: 6 },
+      wrapperCol: { span: 14 },
+    };
 
     const children = devices.map(device => (
       <Option key={device.id}>{device.name}</Option>
     ));
+
     return (
-      <div>
-        <FlexWrapper>
-          <HeaderTag>Device name :</HeaderTag>
-          <Input
-            placeholder="Device name"
-            value={name}
-            onChange={this.handleNameChange}
-          ></Input>
-        </FlexWrapper>
-        <SelectWrapper>
-          <HeaderTag>Select Basic Devices :</HeaderTag>
-          <Select
-            mode="multiple"
-            style={{ width: '30%' }}
-            placeholder="Select Devices"
-            onChange={this.handleChange}
-          >
-            {children}
-          </Select>
-        </SelectWrapper>
-        <FlexWrapper>
-          <Button
-            type={createBasicTypeClicked ? 'primary' : undefined}
-            onClick={this.toggleCreateBasicButton}
-          >
-            Create Basic Device
-          </Button>
-        </FlexWrapper>
-        {createBasicTypeClicked ? (
-          <DeviceCreationForm wrappedComponentRef={saveFormRef} />
-        ) : (
-          <div></div>
-        )}
-      </div>
+      <Form {...formItemLayout} onSubmit={this.handleSubmit}>
+        <Form.Item {...formItemLayout} label="Complex Device Name">
+          {getFieldDecorator('complexName', {
+            rules: [
+              {
+                required: true,
+                message: 'Enter Complex Device Name',
+              },
+            ],
+          })(<Input placeholder="Enter Complex Device Name" />)}
+        </Form.Item>
+        <Form.Item label="Select Devices">
+          {getFieldDecorator('basicDevicesId', {
+            rules: [
+              {
+                required: true,
+                message: 'Select basic devices',
+                type: 'array',
+              },
+            ],
+          })(
+            <Select mode="multiple" placeholder="Select Devices">
+              {children}
+            </Select>
+          )}
+        </Form.Item>
+      </Form>
     );
   }
 }
 
-export default ComplexDeviceCreationModal;
+const WrappedComplexCreationForm = Form.create<FormComponentProps & Props>({
+  name: 'validate_complex_form',
+})(ComplexDeviceCreationForm);
+
+export default WrappedComplexCreationForm;

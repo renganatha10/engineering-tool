@@ -15,7 +15,6 @@ interface Props {
 
 const Devices = (props: Props) => {
   const { data } = props;
-
   return (
     <div>
       {data.map((item: any) => (
