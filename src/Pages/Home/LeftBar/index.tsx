@@ -1,11 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Button } from 'antd';
+import { Button, Collapse } from 'antd';
 
 import { DevicesContext } from '../../../Contexts/DevicesContext';
 
+import DeviceStore from '../../../store/deviceStore';
 import DeviceCreation from './DeviceCreationModal';
 import Devices from './Devices';
+
+const { Panel } = Collapse;
 
 const LeftBarWrapper = styled.div`
   left: 0;
@@ -26,6 +29,7 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   padding-bottom: 10px;
   border-bottom: 1px solid black;
+  margin: 0px 0px 10px 0px;
 `;
 
 interface Device {
@@ -35,34 +39,62 @@ interface Device {
   name: string;
 }
 
-const LeftBar = () => {
-  const [modalVisible, toggleModalVisible] = useState<boolean>(false);
+interface Props {
+  deviceStore: typeof DeviceStore.Type;
+}
+
+const LeftBar = (props: Props) => {
+  const [isCreateDeviceVisible, toggleCreateDeviceVisible] = useState<boolean>(
+    false
+  );
   const { devices, onAddingDevices } = useContext(DevicesContext);
+  const { deviceStore } = props;
 
-  const showModal = () => {
-    toggleModalVisible(true);
-  };
+  const showDeviceCreation = useCallback(() => {
+    toggleCreateDeviceVisible(true);
+  }, []);
 
-  const hideModal = () => {
-    toggleModalVisible(false);
-  };
+  const hideDeviceCreate = React.useCallback(() => {
+    toggleCreateDeviceVisible(false);
+  }, []);
 
   const onDeviceCreate = (device: Device) => {
     onAddingDevices && onAddingDevices(device);
-    toggleModalVisible(false);
+    deviceStore.addBasicDevice(device);
+    toggleCreateDeviceVisible(false);
   };
+
+  if (isCreateDeviceVisible) {
+    return (
+      <DeviceCreation
+        onCreate={onDeviceCreate}
+        onCancel={hideDeviceCreate}
+        devices={devices}
+      />
+    );
+  }
 
   return (
     <LeftBarWrapper>
       <ButtonContainer>
-        <Button onClick={showModal} type="danger" shape="circle" icon="plus" />
+        <Button
+          onClick={showDeviceCreation}
+          type="danger"
+          shape="circle"
+          icon="plus"
+        />
       </ButtonContainer>
-      <DeviceCreation
-        onCreate={onDeviceCreate}
-        onCancel={hideModal}
-        visible={modalVisible}
-      />
-      <Devices data={devices} />
+      <Collapse accordion>
+        <Panel header="Basic Devices" key="1">
+          <Devices data={deviceStore.basicDevices.toJSON()} />
+        </Panel>
+        <Panel header="Complex Devices" key="2">
+          <Devices data={devices} />
+        </Panel>
+        <Panel header="Plant" key="3">
+          <Devices data={devices} />
+        </Panel>
+      </Collapse>
     </LeftBarWrapper>
   );
 };

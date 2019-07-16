@@ -1,6 +1,10 @@
 import React, { PureComponent } from 'react';
 import { Skeleton } from 'antd';
 import styled from 'styled-components';
+import { Provider } from 'mobx-react';
+import { onSnapshot } from 'mobx-state-tree';
+
+import DeviceStore from '../../store/deviceStore';
 
 import FunctionProvoider from '../../Contexts/FunctionStoreContext';
 import FunctionsProvoider, {
@@ -26,6 +30,7 @@ interface State {
   rehydrating: boolean;
   functions: Function[];
   devices: Device[];
+  deviceStore: typeof DeviceStore.Type;
 }
 
 class TypesCreation extends PureComponent<{}, State> {
@@ -35,19 +40,31 @@ class TypesCreation extends PureComponent<{}, State> {
       rehydrating: true,
       functions: [],
       devices: [],
+      deviceStore: DeviceStore.create(this.deviceInitialState),
     };
   }
+
+  public deviceInitialState = {};
 
   public componentDidMount() {
     this._loadPeristedItems();
   }
 
-  private _loadPeristedItems = () => {
+  private _loadPeristedItems = async () => {
     const stringfiedDevices = window.localStorage.getItem('devices');
     const stringfiedFunctions = window.localStorage.getItem('functions');
 
+    const deviceStoreRehydrated = window.localStorage.getItem('deviceStore');
+
     let functions = [];
     let devices = [];
+
+    let { deviceStore } = this.state;
+
+    if (deviceStoreRehydrated) {
+      this.deviceInitialState = JSON.parse(deviceStoreRehydrated);
+      deviceStore = DeviceStore.create(this.deviceInitialState);
+    }
 
     if (stringfiedFunctions) {
       try {
@@ -67,43 +84,50 @@ class TypesCreation extends PureComponent<{}, State> {
       }
     }
 
+    onSnapshot(deviceStore, snapShot =>
+      window.localStorage.setItem('deviceStore', JSON.stringify(snapShot))
+    );
+
     this.setState({
       rehydrating: false,
       functions,
       devices,
+      deviceStore,
     });
   };
 
   public render() {
-    const { rehydrating, devices, functions } = this.state;
+    const { rehydrating, devices, functions, deviceStore } = this.state;
     if (rehydrating) {
       return <Skeleton active={rehydrating} />;
     }
 
     return (
-      <FunctionProvoider>
-        <FunctionsProvoider initFunctions={functions}>
-          <DevicesProvoider initDevices={devices}>
-            <HomeWrapper>
-              <FunctionsContext.Consumer>
-                {({ functions }) => {
-                  return (
-                    <DevicesContext.Consumer>
-                      {({ devices }) => {
-                        return (
-                          <Canvas devices={devices} functions={functions} />
-                        );
-                      }}
-                    </DevicesContext.Consumer>
-                  );
-                }}
-              </FunctionsContext.Consumer>
-              <LeftBar />
-              <RightBar />
-            </HomeWrapper>
-          </DevicesProvoider>
-        </FunctionsProvoider>
-      </FunctionProvoider>
+      <Provider deviceStore={deviceStore}>
+        <FunctionProvoider>
+          <FunctionsProvoider initFunctions={functions}>
+            <DevicesProvoider initDevices={devices}>
+              <HomeWrapper>
+                <FunctionsContext.Consumer>
+                  {({ functions }) => {
+                    return (
+                      <DevicesContext.Consumer>
+                        {({ devices }) => {
+                          return (
+                            <Canvas devices={devices} functions={functions} />
+                          );
+                        }}
+                      </DevicesContext.Consumer>
+                    );
+                  }}
+                </FunctionsContext.Consumer>
+                <LeftBar deviceStore={deviceStore} />
+                <RightBar />
+              </HomeWrapper>
+            </DevicesProvoider>
+          </FunctionsProvoider>
+        </FunctionProvoider>
+      </Provider>
     );
   }
 }

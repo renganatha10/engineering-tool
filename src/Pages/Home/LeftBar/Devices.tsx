@@ -1,4 +1,5 @@
 import React from 'react';
+
 import DraggbleItem from '../../../Components/DraggableItem';
 
 interface DeviceType {
@@ -14,9 +15,10 @@ interface Props {
 
 const Devices = (props: Props) => {
   const { data } = props;
+
   return (
     <div>
-      {data.map(item => (
+      {data.map((item: any) => (
         <DraggbleItem
           type={'device'}
           id={item.id}
