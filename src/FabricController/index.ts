@@ -1,6 +1,12 @@
 import { fabric } from 'fabric';
 import uuid from 'uuid/v4';
 
+import {
+  CanvasObject,
+  CanvasNodeData,
+  CanvasNodePosition,
+  CanvasLinePosition,
+} from '../MobxStore/pages';
 import Node from './Node';
 import Input from './Source/Input';
 import Output from './Source/Output';
@@ -16,6 +22,7 @@ interface FunctionType {
 interface PositionType {
   x: number;
   y: number;
+  type: string;
 }
 
 const RECT_SIZE = 120;
@@ -34,9 +41,9 @@ class FabricController {
 
   public init() {
     this._canvas = new fabric.Canvas('c', { selection: false });
+    this._addGrids();
     this._canvas.on('mouse:up', this.onCanvasMouseUp);
     this._canvas.on('mouse:down', this.onCanvasMouseDown);
-    this._addGrids();
     this._inputController = new Input(this._canvas);
     this._outputController = new Output(this._canvas);
     this._connectionController = new Connection(this._canvas);
@@ -48,6 +55,82 @@ class FabricController {
     );
   }
 
+  public loadFromSavedCanvasObjects = (
+    canvasObjects: typeof CanvasObject.Type[]
+  ) => {
+    this._canvas.clear();
+    this._nodeController.clearAllNodes();
+    this._outputController.clearAllOutputs();
+    this._inputController.clearAllInputs();
+    this._connectionController.clearAllConnections();
+    this._addGrids();
+    canvasObjects.forEach(object => {
+      if (object.type === 'Node') {
+        const { name, data, position, isDevice } = object;
+        const canvasNodeData = data as typeof CanvasNodeData.Type;
+        const canvasPosition = position as typeof CanvasNodePosition.Type;
+        this._nodeController.add({
+          name,
+          data: canvasNodeData,
+          position: canvasPosition,
+          isDevice,
+          isLoaded: true,
+        });
+      } else if (object.type === 'Input') {
+        const { name, data, position } = object;
+        const canvasPosition = position as typeof CanvasNodePosition.Type;
+        this._inputController.add(
+          {
+            radius: 5,
+            fill: 'green',
+            name,
+            left: canvasPosition.x,
+            top: canvasPosition.y,
+            data,
+            selectable: false,
+          },
+          true
+        );
+      } else if (object.type === 'Output') {
+        const { name, data, position } = object;
+        const canvasPosition = position as typeof CanvasNodePosition.Type;
+        this._outputController.add(
+          {
+            radius: 5,
+            fill: 'red',
+            name,
+            left: canvasPosition.x,
+            top: canvasPosition.y,
+            data,
+            selectable: false,
+          },
+          true
+        );
+      } else if (object.type === 'Line') {
+        const { name, data, position } = object;
+        const { x1, x2, y1, y2 } = position as typeof CanvasLinePosition.Type;
+        this._connectionController.loadFromLocal({
+          fill: '#999999',
+          stroke: '#999999',
+          originX: 'center',
+          originY: 'center',
+          selectable: false,
+          hasBorders: false,
+          hasControls: false,
+          evented: false,
+          x1,
+          x2,
+          y1,
+          y2,
+          data,
+          name,
+        });
+      }
+    });
+  };
+
+  public getCanvas = () => this._canvas;
+
   public addNodes = (
     func: FunctionType,
     position: PositionType,
@@ -55,13 +138,21 @@ class FabricController {
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
+
     this.addInputs(numberOfInputs, groupId, position);
     this.addOutputs(numberOfOutputs, groupId, position);
     this._nodeController.add({
       name,
-      data: { id, nodeId: groupId },
+      data: {
+        type: 'Node',
+        id,
+        nodeId: groupId,
+        numberOfInputs,
+        numberOfOutputs,
+      },
       position,
       isDevice,
+      isLoaded: false,
     });
   };
 
@@ -75,20 +166,24 @@ class FabricController {
 
     Array.from(Array(numberOfInputs)).forEach((_, index) => {
       const y1 = 100 - inputVarient * (index + 1) + 20;
-      this._inputController.add({
-        radius: 5,
-        top: y + y1,
-        left: x - 5,
-        fill: 'green',
-        data: {
-          index,
-          nodeId: uuid(),
-          groupId,
-          y1Factor: y1,
+      this._inputController.add(
+        {
+          radius: 5,
+          top: y + y1,
+          left: x - 5,
+          fill: 'green',
+          data: {
+            index,
+            nodeId: uuid(),
+            groupId,
+            y1Factor: y1,
+            type: 'Input',
+          },
+          name: 'input',
+          selectable: false,
         },
-        name: 'input',
-        selectable: false,
-      });
+        false
+      );
     });
   };
 
@@ -101,22 +196,26 @@ class FabricController {
     Array.from(Array(numberOfOutputs)).forEach((_, index) => {
       const { x, y } = position;
       const y1 = 100 - outPutVarient * (index + 1) + 20;
-      this._outputController.add({
-        radius: 5,
-        top: y + y1,
-        left: x + RECT_SIZE,
-        originX: 'center',
-        originY: 'center',
-        fill: 'red',
-        data: {
-          index,
-          nodeId: uuid(),
-          groupId,
-          y1Factor: y1,
+      this._outputController.add(
+        {
+          radius: 5,
+          top: y + y1,
+          left: x + RECT_SIZE,
+          originX: 'center',
+          originY: 'center',
+          fill: 'red',
+          data: {
+            index,
+            nodeId: uuid(),
+            groupId,
+            y1Factor: y1,
+            type: 'Output',
+          },
+          selectable: false,
+          name: 'output',
         },
-        selectable: false,
-        name: 'output',
-      });
+        false
+      );
     });
   };
 
@@ -169,11 +268,15 @@ class FabricController {
           if (fromData.fromGroupId === groupId) {
             this._connectionController.remove(line);
           } else {
-            this._connectionController.makeConnection(line, {
-              toGroupId: groupId,
-              toNodeId: nodeId,
-              toIndex: index,
-            });
+            this._connectionController.makeConnection(
+              line,
+              {
+                toGroupId: groupId,
+                toNodeId: nodeId,
+                toIndex: index,
+              },
+              false
+            );
           }
         }
       }

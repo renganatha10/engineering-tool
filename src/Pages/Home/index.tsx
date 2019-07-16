@@ -15,6 +15,7 @@ import DevicesProvoider, {
 import Canvas from './Canvas';
 import RightBar from './RightBar';
 import LeftBar from './LeftBar';
+import BottomBar from './BottomBar';
 
 const HomeWrapper = styled.div`
   position: relative;
@@ -100,6 +101,7 @@ class TypesCreation extends PureComponent<{}, State> {
               </FunctionsContext.Consumer>
               <LeftBar />
               <RightBar />
+              <BottomBar />
             </HomeWrapper>
           </DevicesProvoider>
         </FunctionsProvoider>
