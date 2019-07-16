@@ -150,8 +150,15 @@ class CanvasRenderer extends Component<Props, State> {
     } else {
       const droppedDevice = devices.find(func => func.id === id);
       if (droppedDevice) {
+        const modifiedResponse = {
+          id: droppedDevice.id,
+          name: droppedDevice.name,
+          numberOfInputs: droppedDevice.inputs.length,
+          numberOfOutputs: droppedDevice.outputs.length,
+        };
+
         this.fabricCanvas.addNodes(
-          droppedDevice,
+          modifiedResponse,
           {
             x: e.pageX,
             y: e.pageY,
