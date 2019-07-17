@@ -80,9 +80,10 @@ const LeftBar = (props: LeftBarProps) => {
       devices.addBasicDevice(device as BasicType);
     } else if (type === 'Complex') {
       devices.addComplexDevice(device as ComplexType);
-    } else if (type === 'Plant') {
-      devices.addPlant(device as PlantType);
     }
+    // else if (type === 'Plant') {
+    //   devices.addPlant(device as PlantType);
+    // }
 
     toggleCreateDeviceVisible(false);
   };
@@ -101,12 +102,12 @@ const LeftBar = (props: LeftBarProps) => {
     };
   });
 
-  const plants = devices.plants.toJSON().map(plant => {
-    return {
-      id: plant.id,
-      name: plant.name,
-    };
-  });
+  // const plants = devices.plants.toJSON().map(plant => {
+  //   return {
+  //     id: plant.id,
+  //     name: plant.name,
+  //   };
+  // });
 
   if (isCreateDeviceVisible) {
     return (
@@ -135,9 +136,9 @@ const LeftBar = (props: LeftBarProps) => {
         <Panel header="Complex Devices" key="2">
           <Devices data={complexDevices} type={'Complex'} />
         </Panel>
-        <Panel header="Plant" key="3">
+        {/* <Panel header="Plant" key="3">
           <Devices data={plants} type={'Plant'} />
-        </Panel>
+        </Panel> */}
       </Collapse>
     </LeftBarWrapper>
   );

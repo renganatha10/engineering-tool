@@ -29,7 +29,7 @@ const DraggableItem = ({ name, id, type, subType }: Props) => {
         }
       }
     },
-    [type]
+    [type, subType]
   );
 
   return (
