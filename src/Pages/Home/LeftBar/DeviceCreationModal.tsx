@@ -21,7 +21,7 @@ interface Device {
 
 interface Props {
   onCancel: () => void;
-  onCreate: (device: Device) => void;
+  onCreate: (device: Device, type: string) => void;
   devices: typeof DeviceStore.Type;
 }
 
@@ -39,6 +39,7 @@ interface FormValues {
   basicDevicesId: string[];
   plantName: string;
   areas: string[];
+  complexDevicesId: string[];
 }
 
 const FlexWrapper = styled.div`
@@ -74,7 +75,7 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
   };
 
   public handleCreate = () => {
-    const { onCreate, devices } = this.props;
+    const { onCreate } = this.props;
     const { mode } = this.state;
     if (this.formRef) {
       const { form } = this.formRef.props as FormComponentProps<FormValues>;
@@ -90,7 +91,7 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
             inputs: inputs,
             name: username,
           };
-          onCreate(newDevice);
+          onCreate(newDevice, 'Basic');
           form.resetFields();
         });
       } else if (mode === 'Complex') {
@@ -106,23 +107,25 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
             basicDevices: basicDevicesId,
           };
           //@ts-ignore
-          devices.addComplexDevice(newDevice);
+          onCreate(newDevice, 'Complex');
+          form.resetFields();
         });
       } else if (mode === 'Plant') {
         form.validateFields((err, values) => {
           if (err) {
             return;
           }
-          const { plantName, areas, basicDevicesId } = values;
-
+          const { plantName, areas, basicDevicesId, complexDevicesId } = values;
           const newPlant = {
             name: plantName,
             id: uuid(),
             plantArea: areas,
             basicDevices: basicDevicesId,
+            complexDevices: complexDevicesId,
           };
           //@ts-ignore
-          devices.addPlant(newPlant);
+          onCreate(newPlant, 'Plant');
+          form.resetFields();
         });
       }
     }
@@ -143,9 +146,9 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
         <Header onClose={onCancel} onSave={this.handleCreate}></Header>
         <FlexWrapper>
           <Radio.Group onChange={this.onChange} value={mode}>
-            <Radio value={1}>Basic Type</Radio>
-            <Radio value={2}>Complex Type</Radio>
-            <Radio value={3}>Plant</Radio>
+            <Radio value={'Basic'}>Basic Type</Radio>
+            <Radio value={'Complex'}>Complex Type</Radio>
+            <Radio value={'Plant'}>Plant</Radio>
           </Radio.Group>
         </FlexWrapper>
         {mode === 'Basic' ? (
@@ -159,7 +162,8 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
           mode === 'Plant' && (
             <PlantCreationForm
               wrappedComponentRef={this.saveFormRef}
-              data={devices.basicDevices.toJSON()}
+              basicDevices={devices.basicDevices.toJSON()}
+              complexDevices={devices.complexDevices.toJSON()}
             />
           )
         )}

@@ -9,8 +9,15 @@ interface DeviceType {
   id: string;
 }
 
+// interface ComplexType {
+//   id: string;
+//   name: string;
+//   basicDevices: DeviceType[];
+// }
+
 interface Props {
-  data: DeviceType[];
+  basicDevices: DeviceType[];
+  complexDevices: any;
 }
 
 interface State {
@@ -43,11 +50,15 @@ class Plant extends React.PureComponent<FormComponentProps & Props, State> {
   };
 
   public render() {
-    const { form, data } = this.props;
+    const { form, basicDevices, complexDevices } = this.props;
     const { getFieldDecorator } = form;
     const location = ['Floor 1', 'Floor 2', 'Floor 3', 'Floor 4'];
 
-    const deviceChildren = data.map(device => (
+    const basicDeviceChildren = basicDevices.map(device => (
+      <Option key={device.id}>{device.name}</Option>
+    ));
+
+    const complexDeviceChildren = complexDevices.map((device: any) => (
       <Option key={device.id}>{device.name}</Option>
     ));
 
@@ -64,7 +75,7 @@ class Plant extends React.PureComponent<FormComponentProps & Props, State> {
       <div>
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Form.Item {...formItemLayout} label="Plant Name">
-            {getFieldDecorator('plantname', {
+            {getFieldDecorator('plantName', {
               rules: [
                 {
                   required: true,
@@ -88,22 +99,37 @@ class Plant extends React.PureComponent<FormComponentProps & Props, State> {
               </Select>
             )}
           </Form.Item>
+          <Form.Item label="Select Basic Devices">
+            {getFieldDecorator('basicDevicesId', {
+              rules: [
+                {
+                  required: false,
+                  message: 'Select basic devices',
+                  type: 'array',
+                },
+              ],
+            })(
+              <Select mode="multiple" placeholder="Select Basic Devices">
+                {basicDeviceChildren}
+              </Select>
+            )}
+          </Form.Item>
+          <Form.Item label="Select Complex Devices">
+            {getFieldDecorator('complexDevicesId', {
+              rules: [
+                {
+                  required: false,
+                  message: 'Select complex devices',
+                  type: 'array',
+                },
+              ],
+            })(
+              <Select mode="multiple" placeholder="Select complex Devices">
+                {complexDeviceChildren}
+              </Select>
+            )}
+          </Form.Item>
         </Form>
-        <Form.Item label="Select Devices">
-          {getFieldDecorator('basicDevicesId', {
-            rules: [
-              {
-                required: true,
-                message: 'Select basic devices',
-                type: 'array',
-              },
-            ],
-          })(
-            <Select mode="multiple" placeholder="Select Devices">
-              {deviceChildren}
-            </Select>
-          )}
-        </Form.Item>
       </div>
     );
   }

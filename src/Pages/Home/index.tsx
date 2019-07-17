@@ -10,10 +10,7 @@ import FunctionsProvoider, {
   FunctionsContext,
   Function,
 } from '../../Contexts/FunctionsStoreContext';
-import DevicesProvoider, {
-  DevicesContext,
-  Device,
-} from '../../Contexts/DevicesContext';
+import DevicesProvoider, { Device } from '../../Contexts/DevicesContext';
 
 import Canvas from './Canvas';
 import RightBar from './RightBar';
@@ -100,15 +97,7 @@ class TypesCreation extends PureComponent<{}, State> {
             <HomeWrapper>
               <FunctionsContext.Consumer>
                 {({ functions }) => {
-                  return (
-                    <DevicesContext.Consumer>
-                      {({ devices }) => {
-                        return (
-                          <Canvas devices={devices} functions={functions} />
-                        );
-                      }}
-                    </DevicesContext.Consumer>
-                  );
+                  return <Canvas functions={functions} />;
                 }}
               </FunctionsContext.Consumer>
               <LeftBar devices={storeDevices} />

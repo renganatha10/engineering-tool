@@ -138,7 +138,6 @@ class FabricController {
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
-
     this.addInputs(numberOfInputs, groupId, position);
     this.addOutputs(numberOfOutputs, groupId, position);
     this._nodeController.add({

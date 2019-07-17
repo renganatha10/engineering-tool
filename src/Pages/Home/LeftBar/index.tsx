@@ -32,11 +32,25 @@ const ButtonContainer = styled.div`
   margin: 0px 0px 10px 0px;
 `;
 
-interface Device {
-  inputs: string[];
-  outputs: string[];
+interface BasicType {
   id: string;
   name: string;
+  inputs: string[];
+  outputs: string[];
+}
+
+interface ComplexType {
+  basicDevices: BasicType[];
+  id: string;
+  name: string;
+}
+
+interface PlantType {
+  id: string;
+  name: string;
+  plantArea: string[];
+  basicDevices: BasicType[];
+  complexDevices: ComplexType[];
 }
 
 interface LeftBarProps {
@@ -58,10 +72,41 @@ const LeftBar = (props: LeftBarProps) => {
     toggleCreateDeviceVisible(false);
   }, []);
 
-  const onDeviceCreate = (device: Device) => {
-    devices.addBasicDevice(device);
+  const onDeviceCreate = (
+    device: BasicType | ComplexType | PlantType,
+    type: string
+  ) => {
+    if (type === 'Basic') {
+      devices.addBasicDevice(device as BasicType);
+    } else if (type === 'Complex') {
+      devices.addComplexDevice(device as ComplexType);
+    } else if (type === 'Plant') {
+      devices.addPlant(device as PlantType);
+    }
+
     toggleCreateDeviceVisible(false);
   };
+
+  const basicDevices = devices.basicDevices.toJSON().map(device => {
+    return {
+      id: device.id,
+      name: device.name,
+    };
+  });
+
+  const complexDevices = devices.complexDevices.toJSON().map(device => {
+    return {
+      id: device.id,
+      name: device.name,
+    };
+  });
+
+  const plants = devices.plants.toJSON().map(plant => {
+    return {
+      id: plant.id,
+      name: plant.name,
+    };
+  });
 
   if (isCreateDeviceVisible) {
     return (
@@ -85,13 +130,13 @@ const LeftBar = (props: LeftBarProps) => {
       </ButtonContainer>
       <Collapse accordion>
         <Panel header="Basic Devices" key="1">
-          <Devices data={devices.basicDevices.toJSON()} />
+          <Devices data={basicDevices} type={'Basic'} />
         </Panel>
         <Panel header="Complex Devices" key="2">
-          <Devices data={devices.basicDevices.toJSON()} />
+          <Devices data={complexDevices} type={'Complex'} />
         </Panel>
         <Panel header="Plant" key="3">
-          <Devices data={devices.basicDevices.toJSON()} />
+          <Devices data={plants} type={'Plant'} />
         </Panel>
       </Collapse>
     </LeftBarWrapper>

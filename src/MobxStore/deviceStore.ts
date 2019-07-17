@@ -15,7 +15,7 @@ interface ComplexType {
 
 interface PlantType {
   id: string;
-  plantName: string;
+  name: string;
   plantArea: string[];
   basicDevices: BasicType[];
   complexDevices: ComplexType[];
@@ -36,7 +36,7 @@ const ComplexDevice = types.model('ComplexDevice', {
 
 const Plants = types.model('Plants', {
   id: types.identifier,
-  plantName: types.string,
+  name: types.string,
   plantArea: types.array(types.string),
   basicDevices: types.array(types.safeReference(BasicDevice)),
   complexDevices: types.array(types.safeReference(ComplexDevice)),
