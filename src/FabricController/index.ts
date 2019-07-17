@@ -23,6 +23,7 @@ interface PositionType {
   x: number;
   y: number;
   type: string;
+  scale: number;
 }
 
 const RECT_SIZE = 120;

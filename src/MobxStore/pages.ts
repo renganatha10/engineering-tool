@@ -40,15 +40,23 @@ export const CanvasLinePosition = types.model('CanvasLinePosition', {
   type: 'Line',
 });
 
+export const CanvasSourcePosition = types.model('CanvasNodePosition', {
+  x: types.number,
+  y: types.number,
+  type: types.enumeration('type', ['Input', 'Output']),
+});
+
 export const CanvasNodePosition = types.model('CanvasNodePosition', {
   x: types.number,
   y: types.number,
-  type: types.enumeration('type', ['Node', 'Input', 'Output']),
+  scale: types.number,
+  type: 'Node',
 });
 
 export type PositionArgs =
   | typeof CanvasLinePosition.Type
-  | typeof CanvasNodePosition.Type;
+  | typeof CanvasNodePosition.Type
+  | typeof CanvasSourcePosition.Type;
 
 export const CanvasObject = types
   .model('CanvasObject', {
@@ -61,9 +69,10 @@ export const CanvasObject = types
         dispatcher: data => {
           switch (data.type) {
             case 'Node':
+              return CanvasNodePosition;
             case 'Input':
             case 'Output': {
-              return CanvasNodePosition;
+              return CanvasSourcePosition;
             }
             default:
               return CanvasLinePosition;
@@ -71,7 +80,8 @@ export const CanvasObject = types
         },
       },
       CanvasLinePosition,
-      CanvasNodePosition
+      CanvasNodePosition,
+      CanvasSourcePosition
     ),
     data: types.union(
       {
