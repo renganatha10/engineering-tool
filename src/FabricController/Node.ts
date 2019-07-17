@@ -26,12 +26,14 @@ interface AddArgs {
 interface PositionType {
   x: number;
   y: number;
+  scale: number;
 }
 
 interface AddToGroupArgs {
   nodes: fabric.Object[];
   x: number;
   y: number;
+  scale: number;
   data: any;
 }
 
@@ -75,7 +77,7 @@ class Node {
       originY: 'center',
     });
 
-    const { x, y } = position;
+    const { x, y, scale } = position;
 
     if (!isLoaded) {
       eventEmitter.emit('ADD_NODE', {
@@ -93,7 +95,7 @@ class Node {
         'assets/motor.png',
         image => {
           const nodes = [rect, image, text];
-          this._addToGroup({ nodes, x, y, data });
+          this._addToGroup({ nodes, x, scale, y, data });
         },
         {
           top: 20,
@@ -105,19 +107,24 @@ class Node {
       );
     } else {
       const nodes = [rect, text];
-      this._addToGroup({ nodes, x, y, data });
+      this._addToGroup({ nodes, x, y, scale, data });
     }
   }
 
-  private _addToGroup = ({ nodes, x, y, data }: AddToGroupArgs) => {
+  private _addToGroup = ({ nodes, x, y, scale, data }: AddToGroupArgs) => {
     const group = new fabric.Group(nodes, {
       left: x,
       top: y,
       data,
       name: 'functionBlock',
-      hasControls: false,
+      hasControls: true,
+      hasRotatingPoint: false,
+      lockUniScaling: true,
       hasBorders: false,
+      cornerColor: `#081000`,
       selectable: true,
+      scaleX: scale,
+      scaleY: scale,
     });
 
     this._nodes.push(group);
@@ -126,6 +133,8 @@ class Node {
     group.on('moving', this.onNodeMoving);
     group.on('mousedblclick', this.onNodeDoubleClick);
     group.on('moved', this.onMoved);
+    group.on('scaling', this.onNodeMoving);
+    group.on('scaled', this.onMoved);
   };
 
   public onMoved = (option: fabric.IEvent) => {
@@ -136,15 +145,22 @@ class Node {
         data: { nodeId },
         left,
         top,
+        scaleX,
       } = option.target;
 
       canvasObjects.push({
         id: nodeId,
-        position: { x: left, y: top, type: 'Node' },
+        position: {
+          x: left,
+          y: top,
+          scale: scaleX ? scaleX : 1,
+          type: 'Node',
+        },
       });
 
-      const inputCircles = this._input.inputs.filter(
-        input => input.data.groupId === nodeId
+      const { fromLines, toLines } = this.getLines(nodeId);
+      const { inputCircles, outputCircles } = this.getInputOutputCircles(
+        nodeId
       );
 
       inputCircles.forEach(circle => {
@@ -160,10 +176,6 @@ class Node {
         });
       });
 
-      const outputCircles = this._output.outputs.filter(
-        output => output.data.groupId === nodeId
-      );
-
       outputCircles.forEach(circle => {
         const {
           data: { nodeId },
@@ -176,13 +188,6 @@ class Node {
           position: { x: left, y: top, type: 'Input' },
         });
       });
-
-      const fromLines = this._connection.connections.filter(
-        line => line.data.fromGroupId === nodeId
-      );
-      const toLines = this._connection.connections.filter(
-        line => line.data.toGroupId === nodeId
-      );
 
       toLines.forEach(item => {
         const {
@@ -231,6 +236,8 @@ class Node {
     group.off('moving', this.onNodeMoving);
     group.off('mousedblclick', this.onNodeDoubleClick);
     group.off('moved', this.onMoved);
+    group.on('scaling', this.onNodeMoving);
+    group.on('scaled', this.onMoved);
     this._nodes = this._nodes.filter(
       node => node.data.nodeId !== group.data.nodeId
     );
@@ -242,28 +249,18 @@ class Node {
       const { target } = option;
       const { nodeId } = option.target.data as { nodeId: string };
       this._removeBorders();
-      const fromLines = this._connection.connections.filter(
-        line => line.data.fromGroupId === nodeId
-      );
-
-      const toLines = this._connection.connections.filter(
-        line => line.data.toGroupId === nodeId
-      );
-
-      const inputCircles = this._input.inputs.filter(
-        input => input.data.groupId === nodeId
-      );
-
-      const outputCircles = this._output.outputs.filter(
-        output => output.data.groupId === nodeId
+      const { fromLines, toLines } = this.getLines(nodeId);
+      const { inputCircles, outputCircles } = this.getInputOutputCircles(
+        nodeId
       );
 
       inputCircles.forEach(circle => {
         const { y1Factor, nodeId } = circle.data;
+        const y1 = target.scaleY ? y1Factor * target.scaleY : y1Factor;
         const { left, top } = this._getInputOutPutXY(
           target.left ? target.left : 0,
           target.top ? target.top : 0,
-          y1Factor
+          y1
         );
 
         const toline = toLines.find(item => item.data.toNodeId === nodeId);
@@ -277,11 +274,13 @@ class Node {
 
       outputCircles.forEach(circle => {
         const { y1Factor, nodeId } = circle.data;
+        const width = target.scaleX ? RECT_SIZE * target.scaleX : RECT_SIZE;
+        const y1 = target.scaleY ? y1Factor * target.scaleY : y1Factor;
 
         const { left, top } = this._getInputOutPutXY(
-          target.left ? target.left + RECT_SIZE : RECT_SIZE,
+          target.left ? target.left + width : width,
           target.top ? target.top : 0,
-          y1Factor
+          y1
         );
 
         const fromLine = fromLines.find(
@@ -311,8 +310,9 @@ class Node {
         this.remove(selectedNode);
       }
 
-      const fromLines = this._connection.connections.filter(
-        line => line.data.fromGroupId === this.selectedNodeId
+      const { fromLines, toLines } = this.getLines(this.selectedNodeId);
+      const { inputCircles, outputCircles } = this.getInputOutputCircles(
+        this.selectedNodeId
       );
 
       fromLines.forEach(line => {
@@ -320,27 +320,15 @@ class Node {
         this._connection.remove(line);
       });
 
-      const toLines = this._connection.connections.filter(
-        line => line.data.toGroupId === this.selectedNodeId
-      );
-
       toLines.forEach(line => {
         canvasObjectIds.push(line.data.id);
         this._connection.remove(line);
       });
 
-      const inputCircles = this._input.inputs.filter(
-        input => input.data.groupId === this.selectedNodeId
-      );
-
       inputCircles.forEach(line => {
         canvasObjectIds.push(line.data.nodeId);
         this._input.remove(line);
       });
-
-      const outputCircles = this._output.outputs.filter(
-        output => output.data.groupId === this.selectedNodeId
-      );
 
       outputCircles.forEach(line => {
         canvasObjectIds.push(line.data.nodeId);
@@ -382,6 +370,30 @@ class Node {
       left: rectX,
       top: rectY + y1Factor,
     };
+  };
+
+  private getLines = (nodeId: string) => {
+    const fromLines = this._connection.connections.filter(
+      line => line.data.fromGroupId === nodeId
+    );
+
+    const toLines = this._connection.connections.filter(
+      line => line.data.toGroupId === nodeId
+    );
+
+    return { fromLines, toLines };
+  };
+
+  private getInputOutputCircles = (nodeId: string) => {
+    const inputCircles = this._input.inputs.filter(
+      input => input.data.groupId === nodeId
+    );
+
+    const outputCircles = this._output.outputs.filter(
+      output => output.data.groupId === nodeId
+    );
+
+    return { inputCircles, outputCircles };
   };
 }
 
