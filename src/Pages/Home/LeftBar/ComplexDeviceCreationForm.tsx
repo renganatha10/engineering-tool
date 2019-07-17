@@ -2,28 +2,16 @@ import React from 'react';
 import { Select, Input, Form } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
-interface Device {
-  inputs: string[];
-  outputs: string[];
-  id: string;
-  name: string;
-}
+import { BasicDevice } from '../../../MobxStore/deviceStore';
 
 interface Props {
-  devices: Device[];
-}
-
-interface State {
-  name: string;
-  createBasicTypeClicked: boolean;
-  basicDevices: string[];
+  devices: typeof BasicDevice.Type[];
 }
 
 const { Option } = Select;
 
 class ComplexDeviceCreationForm extends React.PureComponent<
-  FormComponentProps & Props,
-  State
+  FormComponentProps & Props
 > {
   public handleSubmit = (e: any) => {
     e.preventDefault();

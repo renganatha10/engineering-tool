@@ -2,22 +2,11 @@ import React from 'react';
 import { Form, Input, Select } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
-interface DeviceType {
-  name: string;
-  inputs: string[];
-  outputs: string[];
-  id: string;
-}
-
-// interface ComplexType {
-//   id: string;
-//   name: string;
-//   basicDevices: DeviceType[];
-// }
+import { BasicDevice, ComplexDevice } from '../../../MobxStore/deviceStore';
 
 interface Props {
-  basicDevices: DeviceType[];
-  complexDevices: any;
+  basicDevices: typeof BasicDevice.Type[];
+  complexDevices: typeof ComplexDevice.Type[];
 }
 
 interface State {

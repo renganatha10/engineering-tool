@@ -5,30 +5,27 @@ import uuid from 'uuid/v1';
 import styled from 'styled-components';
 import { RadioChangeEvent } from 'antd/lib/radio';
 
-import DeviceStore from '../../../MobxStore/deviceStore';
+import DeviceStore, {
+  BasicDevice,
+  ComplexDevice,
+} from '../../../MobxStore/deviceStore';
 
 import DeviceCreationForm from './DeviceCreationForm';
 import Header from './Header';
 import ComplexCreationForm from './ComplexDeviceCreationForm';
 // import PlantCreationForm from './PlantCreationForm';
 
-interface Device {
-  inputs: string[];
-  outputs: string[];
-  id: string;
-  name: string;
-}
-
 interface Props {
   onCancel: () => void;
-  onCreate: (device: Device, type: string) => void;
+  onCreate: (
+    device: typeof BasicDevice.Type | typeof ComplexDevice.Type,
+    type: string
+  ) => void;
   devices: typeof DeviceStore.Type;
 }
 
 interface State {
   mode: 'Basic' | 'Complex' | 'Plant';
-  createBasicTypeClicked: boolean;
-  complexDevice: string[];
 }
 
 interface FormValues {
@@ -63,8 +60,6 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
     super(props);
     this.state = {
       mode: 'Basic',
-      createBasicTypeClicked: false,
-      complexDevice: [],
     };
   }
 
@@ -91,7 +86,7 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
             inputs: inputs,
             name: username,
           };
-          onCreate(newDevice, 'Basic');
+          onCreate(newDevice as typeof BasicDevice.Type, 'Basic');
           form.resetFields();
         });
       } else if (mode === 'Complex') {

@@ -12,7 +12,7 @@ import Input from './Source/Input';
 import Output from './Source/Output';
 import Connection from './Connection';
 
-interface FunctionType {
+export interface FunctionType {
   name: string;
   numberOfInputs: number;
   numberOfOutputs: number;

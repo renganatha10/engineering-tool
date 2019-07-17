@@ -3,7 +3,10 @@ import styled from 'styled-components';
 import { Button, Collapse } from 'antd';
 import { observer } from 'mobx-react';
 
-import DeviceStore from '../../../MobxStore/deviceStore';
+import DeviceStore, {
+  BasicDevice,
+  ComplexDevice,
+} from '../../../MobxStore/deviceStore';
 
 import DeviceCreation from './DeviceCreationModal';
 import Devices from './Devices';
@@ -32,27 +35,6 @@ const ButtonContainer = styled.div`
   margin: 0px 0px 10px 0px;
 `;
 
-interface BasicType {
-  id: string;
-  name: string;
-  inputs: string[];
-  outputs: string[];
-}
-
-interface ComplexType {
-  basicDevices: BasicType[];
-  id: string;
-  name: string;
-}
-
-interface PlantType {
-  id: string;
-  name: string;
-  plantArea: string[];
-  basicDevices: BasicType[];
-  complexDevices: ComplexType[];
-}
-
 interface LeftBarProps {
   devices: typeof DeviceStore.Type;
 }
@@ -73,13 +55,13 @@ const LeftBar = (props: LeftBarProps) => {
   }, []);
 
   const onDeviceCreate = (
-    device: BasicType | ComplexType | PlantType,
+    device: typeof BasicDevice.Type | typeof ComplexDevice.Type,
     type: string
   ) => {
     if (type === 'Basic') {
-      devices.addBasicDevice(device as BasicType);
+      devices.addBasicDevice(device as typeof BasicDevice.Type);
     } else if (type === 'Complex') {
-      devices.addComplexDevice(device as ComplexType);
+      devices.addComplexDevice(device as typeof ComplexDevice.Type);
     }
     // else if (type === 'Plant') {
     //   devices.addPlant(device as PlantType);

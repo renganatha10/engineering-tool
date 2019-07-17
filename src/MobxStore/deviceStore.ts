@@ -1,40 +1,19 @@
 import { types } from 'mobx-state-tree';
 
-interface BasicType {
-  id: string;
-  name: string;
-  inputs: string[];
-  outputs: string[];
-}
-
-interface ComplexType {
-  basicDevices: BasicType[];
-  id: string;
-  name: string;
-}
-
-interface PlantType {
-  id: string;
-  name: string;
-  plantArea: string[];
-  basicDevices: BasicType[];
-  complexDevices: ComplexType[];
-}
-
-const BasicDevice = types.model('BasicDevice', {
+export const BasicDevice = types.model('BasicDevice', {
   id: types.identifier,
   name: types.string,
   inputs: types.optional(types.array(types.string), []),
   outputs: types.array(types.string),
 });
 
-const ComplexDevice = types.model('ComplexDevice', {
+export const ComplexDevice = types.model('ComplexDevice', {
   basicDevices: types.array(types.safeReference(BasicDevice)),
   id: types.identifier,
   name: types.string,
 });
 
-const Plants = types.model('Plants', {
+export const Plants = types.model('Plants', {
   id: types.identifier,
   name: types.string,
   plantArea: types.array(types.string),
@@ -49,16 +28,16 @@ const Devices = types
     plants: types.array(Plants),
   })
   .actions(self => {
-    const addBasicDevice = (newDevice: BasicType) => {
+    const addBasicDevice = (newDevice: typeof BasicDevice.Type) => {
       self.basicDevices.push(newDevice);
     };
 
-    const addComplexDevice = (newDevice: ComplexType) => {
+    const addComplexDevice = (newDevice: typeof ComplexDevice.Type) => {
       //@ts-ignore
       self.complexDevices.push(newDevice);
     };
 
-    const addPlant = (newPlant: PlantType) => {
+    const addPlant = (newPlant: typeof Plants.Type) => {
       //@ts-ignore
       self.plants.push(newPlant);
     };
