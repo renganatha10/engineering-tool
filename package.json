@@ -5,7 +5,7 @@
   "dependencies": {
     "antd": "^3.19.2",
     "fabric": "^3.1.0",
-    "mobx": "^5.10.0",
+    "mobx": "^5.11.0",
     "mobx-react": "^6.0.3",
     "mobx-state-tree": "^3.14.0",
     "react": "^16.8.6",

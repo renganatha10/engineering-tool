@@ -1,13 +1,7 @@
 import React from 'react';
 
 import FunctionBlock from '../../../Components/DraggableItem';
-
-interface FunctionType {
-  name: string;
-  numberOfInputs: number;
-  numberOfOutputs: number;
-  id: string;
-}
+import { FunctionType } from '../../../FabricController';
 
 interface Props {
   data: FunctionType[];
