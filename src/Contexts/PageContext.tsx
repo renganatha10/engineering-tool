@@ -22,11 +22,13 @@ interface Context {
   type: ContextType;
   position: ContextLinePosition | ContextNodePosition;
   isDevice: boolean;
+  isTimer: boolean;
 }
 
 interface NodeData {
   data: any;
   isDevice: boolean;
+  isTimer: boolean;
   name: string;
   position: {
     x: number;
@@ -82,6 +84,7 @@ const PagesState = (props: Props) => {
         name: nodeData.name,
         data: nodeData.data,
         isDevice: nodeData.isDevice,
+        isTimer: nodeData.isTimer,
         position: {
           x: nodeData.position.x,
           y: nodeData.position.y,
@@ -99,6 +102,7 @@ const PagesState = (props: Props) => {
       page.context.push({
         type: 'Line',
         isDevice: false,
+        isTimer: false,
         name: 'line',
         data: line.data,
         position: {

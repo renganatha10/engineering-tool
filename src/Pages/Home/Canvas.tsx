@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Modal } from 'antd';
 import styled from 'styled-components';
 import { inject, observer } from 'mobx-react';
 
@@ -24,7 +25,7 @@ const InvisibleDiv = styled.div`
   display: none;
 `;
 
-type DraggbleItemType = 'func' | 'device';
+type DraggbleItemType = 'func' | 'device' | 'timer';
 
 interface Props {
   functions: Function[];
@@ -37,6 +38,11 @@ interface CanvasRendererProps extends Props {
 
 interface State {
   prevPageId: string;
+  modalVisible: boolean;
+  timerValue: number;
+  timerCanvasObject: any;
+  timerTarget: any;
+  canvas: any;
 }
 
 interface Position {
@@ -59,6 +65,17 @@ interface NodeMovedObject {
 }
 
 class CanvasRenderer extends Component<Props, State> {
+  public constructor(props: Props) {
+    super(props);
+    this.state = {
+      prevPageId: '',
+      modalVisible: false,
+      timerValue: 0,
+      timerCanvasObject: '',
+      timerTarget: '',
+      canvas: '',
+    };
+  }
   public fabricCanvas = new FabricCanvas();
   public previousPageId = '';
 
@@ -80,6 +97,7 @@ class CanvasRenderer extends Component<Props, State> {
     eventEmitter.on('ADD_NODE', this.onAddNode);
     eventEmitter.on('NODE_MOVED', this.onNodeMoved);
     eventEmitter.on('NODE_DELETED', this.onNodeDeleted);
+    eventEmitter.on('TIMER_CLICK', this.onTimerClicked);
   }
 
   public componentDidUpdate() {
@@ -94,6 +112,37 @@ class CanvasRenderer extends Component<Props, State> {
       }
     }
   }
+
+  public toggleModal = () => {
+    const { modalVisible } = this.state;
+    this.setState({ modalVisible: !modalVisible });
+  };
+
+  public onTimerClicked = (
+    nodeId: string,
+    target: any,
+    canvas: fabric.Canvas
+  ) => {
+    const { pages } = this.injected;
+    const { currentPageId } = pages;
+
+    if (currentPageId) {
+      const currentPageCanvasObjects = currentPageId.canvasObjects;
+
+      const canvasObject = currentPageCanvasObjects.find(
+        item => item.id === nodeId
+      );
+      if (canvasObject) {
+        this.toggleModal();
+        this.setState({
+          timerCanvasObject: canvasObject,
+          timerTarget: target,
+          canvas: canvas,
+          timerValue: canvasObject.timerValue,
+        });
+      }
+    }
+  };
 
   public onNodeDeleted = (nodeIds: string[]) => {
     const { pages } = this.props as CanvasRendererProps;
@@ -137,6 +186,8 @@ class CanvasRenderer extends Component<Props, State> {
     const type = e.dataTransfer.getData('type') as DraggbleItemType;
 
     const isDevice = type === 'device';
+    const isTimer = type === 'timer';
+    const timerValue = 0;
 
     if (type === 'func') {
       const droppedFunction = functions.find(func => func.id === id);
@@ -155,9 +206,30 @@ class CanvasRenderer extends Component<Props, State> {
             scale: 1,
             type: 'Node',
           },
-          isDevice
+          isDevice,
+          isTimer,
+          timerValue
         );
       }
+    } else if (type === 'timer') {
+      const modifiedFunctions = {
+        name: 'Timer' + ' ' + timerValue.toString() + 's',
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        id: id,
+      };
+      this.fabricCanvas.addNodes(
+        modifiedFunctions,
+        {
+          x: e.pageX,
+          y: e.pageY,
+          scale: 1,
+          type: 'Node',
+        },
+        isDevice,
+        isTimer,
+        timerValue
+      );
     } else {
       const droppedDevice = devices.find(func => func.id === id);
       if (droppedDevice) {
@@ -176,7 +248,9 @@ class CanvasRenderer extends Component<Props, State> {
             scale: 1,
             type: 'Node',
           },
-          isDevice
+          isDevice,
+          isTimer,
+          timerValue
         );
       }
     }
@@ -192,14 +266,55 @@ class CanvasRenderer extends Component<Props, State> {
     eventEmitter.off('NODE_DELETED', this.onNodeDeleted);
   }
 
+  public handleChange = (event: any) => {
+    const { value } = event.target;
+    if (value) {
+      this.setState({ timerValue: parseInt(value) });
+    }
+  };
+
+  public handleSubmit = (event: any) => {
+    const { timerValue, timerCanvasObject, timerTarget, canvas } = this.state;
+
+    this.toggleModal();
+    event.preventDefault();
+
+    timerCanvasObject.updateTimerValue(timerValue);
+    timerTarget.set('text', 'Timer ' + timerValue.toString() + 's');
+    canvas.renderAll();
+  };
+
   public render() {
     const { pages } = this.injected;
     const { currentPageId } = pages;
+    const { modalVisible } = this.state;
+
     return (
-      <CanvasWrapper onDragOver={this.onDragOver} onDrop={this.onDrop}>
-        <InvisibleDiv>{currentPageId ? currentPageId.id : ''}</InvisibleDiv>
-        <canvas id="c" width="2000" height="1300" />
-      </CanvasWrapper>
+      <div>
+        <Modal
+          title="Change Timer Value"
+          visible={modalVisible}
+          okText="Change"
+          width={800}
+          onCancel={this.toggleModal}
+          onOk={this.handleSubmit}
+        >
+          <form>
+            <label>
+              Timer Value:
+              <input
+                type="number"
+                value={this.state.timerValue}
+                onChange={this.handleChange}
+              />
+            </label>
+          </form>
+        </Modal>
+        <CanvasWrapper onDragOver={this.onDragOver} onDrop={this.onDrop}>
+          <InvisibleDiv>{currentPageId ? currentPageId.id : ''}</InvisibleDiv>
+          <canvas id="c" width="2000" height="1300" />
+        </CanvasWrapper>
+      </div>
     );
   }
 }

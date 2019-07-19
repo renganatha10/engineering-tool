@@ -67,7 +67,7 @@ class FabricController {
     this._addGrids();
     canvasObjects.forEach(object => {
       if (object.type === 'Node') {
-        const { name, data, position, isDevice } = object;
+        const { name, data, position, isDevice, isTimer } = object;
         const canvasNodeData = data as typeof CanvasNodeData.Type;
         const canvasPosition = position as typeof CanvasNodePosition.Type;
         this._nodeController.add({
@@ -75,6 +75,8 @@ class FabricController {
           data: canvasNodeData,
           position: canvasPosition,
           isDevice,
+          isTimer,
+          timerValue: 0,
           isLoaded: true,
         });
       } else if (object.type === 'Input') {
@@ -135,7 +137,9 @@ class FabricController {
   public addNodes = (
     func: FunctionType,
     position: PositionType,
-    isDevice: boolean
+    isDevice: boolean,
+    isTimer: boolean,
+    timerValue: number
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
@@ -153,6 +157,8 @@ class FabricController {
       },
       position,
       isDevice,
+      isTimer,
+      timerValue,
       isLoaded: false,
     });
   };

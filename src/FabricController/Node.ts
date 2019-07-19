@@ -21,8 +21,11 @@ interface AddArgs {
   data: Nodedata;
   position: PositionType;
   isDevice: boolean;
+  isTimer: boolean;
+  timerValue: number;
   isLoaded: boolean;
 }
+
 interface PositionType {
   x: number;
   y: number;
@@ -35,6 +38,7 @@ interface AddToGroupArgs {
   y: number;
   scale: number;
   data: any;
+  isTimer: boolean;
 }
 
 class Node {
@@ -58,7 +62,15 @@ class Node {
     this.selectedNodeId = '';
     document.addEventListener('keydown', this.onKeyPress);
   }
-  public add({ name, data, position, isDevice, isLoaded }: AddArgs) {
+  public add({
+    name,
+    data,
+    position,
+    isDevice,
+    isTimer,
+    timerValue,
+    isLoaded,
+  }: AddArgs) {
     const rect = new fabric.Rect({
       stroke: isDevice ? 'transparent' : 'black',
       fill: 'transparent',
@@ -66,6 +78,15 @@ class Node {
       width: RECT_SIZE,
       originX: 'center',
       originY: 'center',
+    });
+
+    const rectTimer = new fabric.Rect({
+      fill: 'lightgreen',
+      height: 20,
+      width: 50,
+      top: 25,
+      originX: 'center',
+      originY: 'top',
     });
 
     const text = new fabric.Text(name, {
@@ -86,6 +107,8 @@ class Node {
         position,
         data,
         isDevice,
+        isTimer,
+        timerValue,
         type: 'Node',
       });
     }
@@ -95,7 +118,7 @@ class Node {
         'assets/motor.png',
         image => {
           const nodes = [rect, image, text];
-          this._addToGroup({ nodes, x, scale, y, data });
+          this._addToGroup({ nodes, x, scale, y, data, isTimer });
         },
         {
           top: 20,
@@ -105,13 +128,23 @@ class Node {
           scaleY: (RECT_SIZE - 20) / 512,
         }
       );
+    } else if (isTimer) {
+      const nodes = [rect, text, rectTimer];
+      this._addToGroup({ nodes, x, y, scale, data, isTimer });
     } else {
       const nodes = [rect, text];
-      this._addToGroup({ nodes, x, y, scale, data });
+      this._addToGroup({ nodes, x, y, scale, data, isTimer });
     }
   }
 
-  private _addToGroup = ({ nodes, x, y, scale, data }: AddToGroupArgs) => {
+  private _addToGroup = ({
+    nodes,
+    x,
+    y,
+    scale,
+    data,
+    isTimer,
+  }: AddToGroupArgs) => {
     const group = new fabric.Group(nodes, {
       left: x,
       top: y,
@@ -121,6 +154,7 @@ class Node {
       hasRotatingPoint: false,
       lockUniScaling: true,
       hasBorders: false,
+      subTargetCheck: true,
       cornerColor: `#081000`,
       selectable: true,
       scaleX: scale,
@@ -135,6 +169,25 @@ class Node {
     group.on('moved', this.onMoved);
     group.on('scaling', this.onNodeMoving);
     group.on('scaled', this.onMoved);
+    if (isTimer) {
+      group.on('mousedown', this.onTimerClick);
+    }
+  };
+
+  public onTimerClick = (option: fabric.IEvent) => {
+    if (option.subTargets && option.target) {
+      const subTarget = option.subTargets[0];
+      //@ts-ignore
+      const targets = option.target.getObjects();
+      if (subTarget === targets[2]) {
+        eventEmitter.emit(
+          'TIMER_CLICK',
+          option.target.data.nodeId,
+          targets[1],
+          this._canvas
+        );
+      }
+    }
   };
 
   public onMoved = (option: fabric.IEvent) => {

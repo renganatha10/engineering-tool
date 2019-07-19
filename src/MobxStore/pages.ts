@@ -63,6 +63,8 @@ export const CanvasObject = types
     id: types.identifier,
     name: types.string,
     isDevice: types.boolean,
+    isTimer: types.optional(types.boolean, false),
+    timerValue: types.optional(types.number, 0),
     type: types.enumeration('type', ['Node', 'Input', 'Output', 'Line']),
     position: types.union(
       {
@@ -107,8 +109,14 @@ export const CanvasObject = types
       self.position = position;
     };
 
+    const updateTimerValue = (timerValue: number) => {
+      self.timerValue = timerValue;
+      self.name = 'Timer ' + timerValue.toString() + 's';
+    };
+
     return {
       updateCanvasPosition,
+      updateTimerValue,
     };
   });
 
