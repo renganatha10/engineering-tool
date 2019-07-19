@@ -17,7 +17,14 @@ interface State {
 class App extends React.PureComponent<{}, State> {
   public initialPageId = uuid();
   public pagesInitialState = {
-    pages: [{ id: this.initialPageId, name: 'Page 1', canvasObjects: [] }],
+    pages: [
+      {
+        id: this.initialPageId,
+        name: 'Page 1',
+        modelId: '',
+        canvasObjects: [],
+      },
+    ],
     currentPageId: this.initialPageId,
   };
 

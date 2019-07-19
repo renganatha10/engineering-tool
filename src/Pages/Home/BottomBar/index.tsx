@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import { observer, inject } from 'mobx-react';
 import uuid from 'uuid/v4';
 
@@ -36,44 +36,115 @@ interface Props {
   pages: typeof PagesStore.Type;
 }
 
-class BottomBar extends React.Component<{}> {
+interface State {
+  modalVisible: boolean;
+  pageName: string;
+  modelId: string;
+}
+
+class BottomBar extends React.Component<{}, State> {
+  public constructor(props: {}) {
+    super(props);
+    const {
+      pages: { pages },
+    } = this.injected;
+    this.state = {
+      modalVisible: false,
+      pageName: `Page ${pages.length + 1}`,
+      modelId: '',
+    };
+  }
+
   public get injected() {
     return this.props as Props;
   }
 
+  public toggleModal = () => {
+    const { modalVisible } = this.state;
+    this.setState({ modalVisible: !modalVisible });
+  };
+
   public _addPage = () => {
     const {
-      pages: { addPage, pages },
+      pages: { addPage },
     } = this.injected;
-    addPage({ id: uuid(), name: `Page ${pages.length + 1}` });
+    const { pageName, modelId } = this.state;
+    this.toggleModal();
+    addPage({ id: uuid(), name: pageName, modelId: modelId });
+  };
+
+  public handleChangeName = (event: any) => {
+    const { value } = event.target;
+    if (value) {
+      this.setState({ pageName: value });
+    }
+  };
+
+  public handleChangeModelId = (event: any) => {
+    const { value } = event.target;
+    if (value) {
+      this.setState({ modelId: value });
+    }
   };
 
   public render() {
     const {
       pages: { pages, currentPageId, changeCurrentPage },
     } = this.injected;
+    const { modalVisible } = this.state;
 
     return (
-      <BottomBarWrapper>
-        <PageContainer>
-          {pages.map(page => (
-            <Pages
-              key={page.id}
-              page={page}
-              currentPageId={currentPageId ? currentPageId.id : ''}
-              onChangeCurrentPageId={changeCurrentPage}
+      <div>
+        <Modal
+          title="Page Details"
+          visible={modalVisible}
+          okText="Submit"
+          width={800}
+          onCancel={this.toggleModal}
+          onOk={this._addPage}
+        >
+          <form>
+            <label>
+              Page Name:
+              <input
+                type="string"
+                value={this.state.pageName}
+                onChange={this.handleChangeName}
+              />
+            </label>
+            <br />
+            <br />
+            <label>
+              Model Id:
+              <input
+                type="string"
+                value={this.state.modelId}
+                onChange={this.handleChangeModelId}
+              />
+            </label>
+          </form>
+        </Modal>
+        <BottomBarWrapper>
+          <PageContainer>
+            {pages.map(page => (
+              <Pages
+                key={page.id}
+                page={page}
+                currentPageId={currentPageId ? currentPageId.id : ''}
+                onChangeCurrentPageId={changeCurrentPage}
+              />
+            ))}
+          </PageContainer>
+          <ButtonContainer>
+            <Button
+              onClick={this.toggleModal}
+              type="primary"
+              shape="circle"
+              icon="plus"
             />
-          ))}
-        </PageContainer>
-        <ButtonContainer>
-          <Button
-            onClick={this._addPage}
-            type="primary"
-            shape="circle"
-            icon="plus"
-          />
-        </ButtonContainer>
-      </BottomBarWrapper>
+          </ButtonContainer>
+        </BottomBarWrapper>
+      </div>
     );
   }
 }
