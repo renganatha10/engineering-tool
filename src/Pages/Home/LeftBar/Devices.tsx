@@ -1,24 +1,25 @@
 import React from 'react';
+
 import DraggbleItem from '../../../Components/DraggableItem';
 
-interface DeviceType {
-  name: string;
-  inputs: string[];
-  outputs: string[];
+interface Data {
   id: string;
+  name: string;
 }
 
 interface Props {
-  data: DeviceType[];
+  data: Data[];
+  type: 'Basic' | 'Complex' | 'Plant';
 }
 
 const Devices = (props: Props) => {
-  const { data } = props;
+  const { data, type } = props;
   return (
     <div>
       {data.map(item => (
         <DraggbleItem
           type={'device'}
+          subType={type}
           id={item.id}
           key={item.id}
           name={item.name}

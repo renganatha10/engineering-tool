@@ -13,19 +13,23 @@ type DraggbleItemType = 'func' | 'device' | 'timer';
 interface Props {
   name: string;
   id: string;
+  subType?: string;
   type: DraggbleItemType;
 }
 
-const DraggableItem = ({ name, id, type }: Props) => {
+const DraggableItem = ({ name, id, type, subType }: Props) => {
   const onDragStart = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       const currentId = e.currentTarget.dataset.id;
       if (currentId) {
         e.dataTransfer.setData('id', currentId);
         e.dataTransfer.setData('type', type);
+        if (subType) {
+          e.dataTransfer.setData('subType', subType);
+        }
       }
     },
-    [type]
+    [type, subType]
   );
 
   return (

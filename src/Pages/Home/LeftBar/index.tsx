@@ -1,11 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { Button } from 'antd';
+import { Button, Collapse } from 'antd';
+import { observer } from 'mobx-react';
 
-import { DevicesContext } from '../../../Contexts/DevicesContext';
+import DeviceStore, {
+  BasicDevice,
+  ComplexDevice,
+} from '../../../MobxStore/deviceStore';
 
 import DeviceCreation from './DeviceCreationModal';
 import Devices from './Devices';
+
+const { Panel } = Collapse;
 
 const LeftBarWrapper = styled.div`
   left: 0;
@@ -26,45 +32,98 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   padding-bottom: 10px;
   border-bottom: 1px solid black;
+  margin: 0px 0px 10px 0px;
 `;
 
-interface Device {
-  inputs: string[];
-  outputs: string[];
-  id: string;
-  name: string;
+interface LeftBarProps {
+  devices: typeof DeviceStore.Type;
 }
 
-const LeftBar = () => {
-  const [modalVisible, toggleModalVisible] = useState<boolean>(false);
-  const { devices, onAddingDevices } = useContext(DevicesContext);
+const LeftBar = (props: LeftBarProps) => {
+  const [isCreateDeviceVisible, toggleCreateDeviceVisible] = useState<boolean>(
+    false
+  );
 
-  const showModal = () => {
-    toggleModalVisible(true);
+  const { devices } = props;
+
+  const showDeviceCreation = useCallback(() => {
+    toggleCreateDeviceVisible(true);
+  }, []);
+
+  const hideDeviceCreate = React.useCallback(() => {
+    toggleCreateDeviceVisible(false);
+  }, []);
+
+  const onDeviceCreate = (
+    device: typeof BasicDevice.Type | typeof ComplexDevice.Type,
+    type: string
+  ) => {
+    if (type === 'Basic') {
+      devices.addBasicDevice(device as typeof BasicDevice.Type);
+    } else if (type === 'Complex') {
+      devices.addComplexDevice(device as typeof ComplexDevice.Type);
+    }
+    // else if (type === 'Plant') {
+    //   devices.addPlant(device as PlantType);
+    // }
+
+    toggleCreateDeviceVisible(false);
   };
 
-  const hideModal = () => {
-    toggleModalVisible(false);
-  };
+  const basicDevices = devices.basicDevices.toJSON().map(device => {
+    return {
+      id: device.id,
+      name: device.name,
+    };
+  });
 
-  const onDeviceCreate = (device: Device) => {
-    onAddingDevices && onAddingDevices(device);
-    toggleModalVisible(false);
-  };
+  const complexDevices = devices.complexDevices.toJSON().map(device => {
+    return {
+      id: device.id,
+      name: device.name,
+    };
+  });
+
+  // const plants = devices.plants.toJSON().map(plant => {
+  //   return {
+  //     id: plant.id,
+  //     name: plant.name,
+  //   };
+  // });
+
+  if (isCreateDeviceVisible) {
+    return (
+      <DeviceCreation
+        onCreate={onDeviceCreate}
+        onCancel={hideDeviceCreate}
+        devices={devices}
+      />
+    );
+  }
 
   return (
     <LeftBarWrapper>
       <ButtonContainer>
-        <Button onClick={showModal} type="danger" shape="circle" icon="plus" />
+        <Button
+          onClick={showDeviceCreation}
+          type="danger"
+          shape="circle"
+          icon="plus"
+        />
       </ButtonContainer>
-      <DeviceCreation
-        onCreate={onDeviceCreate}
-        onCancel={hideModal}
-        visible={modalVisible}
-      />
-      <Devices data={devices} />
+      <Collapse accordion>
+        <Panel header="Basic Devices" key="1">
+          <Devices data={basicDevices} type={'Basic'} />
+        </Panel>
+        <Panel header="Complex Devices" key="2">
+          <Devices data={complexDevices} type={'Complex'} />
+        </Panel>
+        {/* <Panel header="Plant" key="3">
+          <Devices data={plants} type={'Plant'} />
+        </Panel> */}
+      </Collapse>
     </LeftBarWrapper>
   );
 };
 
-export default LeftBar;
+export default observer(LeftBar);

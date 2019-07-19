@@ -5,9 +5,9 @@ import { inject, observer } from 'mobx-react';
 
 import FabricCanvas from '../../FabricController';
 
-import { Device } from '../../Contexts/DevicesContext';
 import { Function } from '../../Contexts/FunctionsStoreContext';
 import PagesStore, { CanvasObject } from './../../MobxStore/pages';
+import DeviceStore from './../../MobxStore/deviceStore';
 
 import eventEmitter from './../../utils/eventListener';
 
@@ -29,11 +29,12 @@ type DraggbleItemType = 'func' | 'device' | 'timer';
 
 interface Props {
   functions: Function[];
-  devices: Device[];
+  // devices: Device[];
 }
 
 interface CanvasRendererProps extends Props {
   pages: typeof PagesStore.Type;
+  devices: typeof DeviceStore.Type;
 }
 
 interface State {
@@ -181,7 +182,8 @@ class CanvasRenderer extends Component<Props, State> {
 
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const { functions, devices } = this.props;
+    const { functions } = this.props;
+    const { devices } = this.injected;
     const id = e.dataTransfer.getData('id');
     const type = e.dataTransfer.getData('type') as DraggbleItemType;
 
@@ -231,27 +233,63 @@ class CanvasRenderer extends Component<Props, State> {
         timerValue
       );
     } else {
-      const droppedDevice = devices.find(func => func.id === id);
-      if (droppedDevice) {
-        const modifiedResponse = {
-          id: droppedDevice.id,
-          name: droppedDevice.name,
-          numberOfInputs: droppedDevice.inputs.length,
-          numberOfOutputs: droppedDevice.outputs.length,
-        };
+      const subType = e.dataTransfer.getData('subType');
+      if (subType === 'Basic') {
+        const droppedDevice = devices.basicDevices
+          .toJSON()
+          .find(func => func.id === id);
+        if (droppedDevice) {
+          const modifiedResponse = {
+            id: droppedDevice.id,
+            name: droppedDevice.name,
+            numberOfInputs: droppedDevice.inputs.length,
+            numberOfOutputs: droppedDevice.outputs.length,
+          };
+          this.fabricCanvas.addNodes(
+            modifiedResponse,
+            {
+              x: e.pageX,
+              y: e.pageY,
+              scale: 1,
+              type: 'Node',
+            },
+            isDevice,
+            isTimer,
+            timerValue
+          );
+        }
+      } else if (subType === 'Complex') {
+        const droppedDevice = devices.complexDevices
+          .toJSON()
+          .find(func => func.id === id);
+        if (droppedDevice) {
+          let xPos = e.pageX;
+          let yPos = e.pageY;
+          droppedDevice.basicDevices.forEach(device => {
+            if (device) {
+              const modifiedResponse = {
+                id: device.id,
+                name: device.name,
+                numberOfInputs: device.inputs.length,
+                numberOfOutputs: device.outputs.length,
+              };
 
-        this.fabricCanvas.addNodes(
-          modifiedResponse,
-          {
-            x: e.pageX,
-            y: e.pageY,
-            scale: 1,
-            type: 'Node',
-          },
-          isDevice,
-          isTimer,
-          timerValue
-        );
+              this.fabricCanvas.addNodes(
+                modifiedResponse,
+                {
+                  x: xPos,
+                  y: yPos,
+                  scale: 1,
+                  type: 'Node',
+                },
+                isDevice,
+                isTimer,
+                timerValue
+              );
+              xPos = xPos + 200;
+            }
+          });
+        }
       }
     }
   };
@@ -319,4 +357,4 @@ class CanvasRenderer extends Component<Props, State> {
   }
 }
 
-export default inject('pages')(observer(CanvasRenderer));
+export default inject('pages', 'devices')(observer(CanvasRenderer));

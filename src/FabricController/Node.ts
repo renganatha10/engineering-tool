@@ -2,23 +2,17 @@ import { fabric } from 'fabric';
 
 import eventEmitter from '../utils/eventListener';
 
+import { CanvasNodeData } from '../MobxStore/pages';
+
 import Input from './Source/Input';
 import Output from './Source/Output';
 import Connection from './Connection';
 
 const RECT_SIZE = 120;
 
-interface Nodedata {
-  id: string;
-  nodeId: string;
-  numberOfInputs: number;
-  numberOfOutputs: number;
-  type: string;
-}
-
 interface AddArgs {
   name: string;
-  data: Nodedata;
+  data: typeof CanvasNodeData.Type;
   position: PositionType;
   isDevice: boolean;
   isTimer: boolean;
