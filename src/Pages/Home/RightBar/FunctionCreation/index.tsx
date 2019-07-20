@@ -7,7 +7,7 @@ import RightBar from './RightBar';
 import Header from './Header';
 
 interface FunctionCreateProps {
-  onCreateFuntion: (name: string) => void;
+  onCreateFuntion: (name: string, modelId: string) => void;
   onClose: () => void;
 }
 

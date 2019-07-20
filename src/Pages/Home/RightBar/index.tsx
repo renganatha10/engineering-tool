@@ -39,13 +39,14 @@ const RightBar = () => {
   >(false);
 
   const onFuntionCreation = useCallback(
-    (name: string) => {
+    (name: string, modelId: string) => {
       const newFunc = {
         inputs,
         outputs,
         conditions,
         id: uuid(),
         name,
+        modelId,
       };
       onAddingFunction && onAddingFunction(newFunc);
       resetAll && resetAll();

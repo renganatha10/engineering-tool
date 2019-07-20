@@ -40,12 +40,13 @@ const ButtonGroup = styled.div`
 
 interface HeaderProps {
   onClose: () => void;
-  onSave: (name: string) => void;
+  onSave: (name: string, modelId: string) => void;
 }
 
 const Header = (props: HeaderProps) => {
-  const { inputs, outputs, conditions } = useContext(FunctionContext);
+  const { inputs, outputs } = useContext(FunctionContext);
   const [functionName, setFunctionName] = useState<string>('');
+  const [modelId, setModelId] = useState<string>('');
   const { onClose, onSave } = props;
 
   const onOk = () => {
@@ -55,27 +56,27 @@ const Header = (props: HeaderProps) => {
     if (outputs.length === 0) {
       message.error('Add Outputs');
     }
-    if (conditions.length === 0) {
-      message.error('Add Conditions');
-    }
     if (functionName === '') {
       message.error('Enter Valid Function Name');
     }
 
-    if (
-      inputs.length !== 0 &&
-      outputs.length !== 0 &&
-      conditions.length !== 0 &&
-      functionName !== ''
-    ) {
-      onSave(functionName);
+    if (inputs.length !== 0 && outputs.length !== 0 && functionName !== '') {
+      onSave(functionName, modelId);
     }
   };
 
-  const onChange = React.useCallback(
+  const onChangeName = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
       setFunctionName(e.target.value);
+    },
+    []
+  );
+
+  const onChangeModelId = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      setModelId(e.target.value);
     },
     []
   );
@@ -84,7 +85,8 @@ const Header = (props: HeaderProps) => {
     <HeaderWrapper>
       <HeaderTag>Function Creation</HeaderTag>
       <InputWrapper>
-        <Input onChange={onChange} placeholder={'Enter Function Name'} />
+        <Input onChange={onChangeName} placeholder={'Enter Function Name'} />
+        <Input onChange={onChangeModelId} placeholder={'Enter Model Id'} />
       </InputWrapper>
       <ButtonGroup>
         <Button.Group size={'large'}>

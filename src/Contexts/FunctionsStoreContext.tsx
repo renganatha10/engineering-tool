@@ -29,6 +29,7 @@ export interface Function {
   conditions: ConditionType[];
   id: string;
   name: string;
+  modelId: string;
 }
 
 interface Props {

@@ -3,6 +3,7 @@ import { types } from 'mobx-state-tree';
 export interface PageArg {
   id: string;
   name: string;
+  modelId: string;
 }
 
 export const CanvasLineData = types.model('CanvasLineData', {
@@ -116,6 +117,7 @@ export const Page = types
   .model('Page', {
     id: types.identifier,
     name: types.string,
+    modelId: types.string,
     canvasObjects: types.array(CanvasObject),
   })
   .actions(self => {
