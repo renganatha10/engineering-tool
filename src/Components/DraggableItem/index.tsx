@@ -8,7 +8,7 @@ const ItemWrapper = styled.div`
   margin: 10px;
 `;
 
-type DraggbleItemType = 'func' | 'device';
+type DraggbleItemType = 'func' | 'device' | 'timer';
 
 interface Props {
   name: string;

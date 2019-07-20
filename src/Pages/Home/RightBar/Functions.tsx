@@ -11,6 +11,7 @@ const Functions = (props: Props) => {
   const { data } = props;
   return (
     <div>
+      <FunctionBlock type={'timer'} id={'0'} name={'Timer'} />
       {data.map(item => (
         <FunctionBlock
           type={'func'}
