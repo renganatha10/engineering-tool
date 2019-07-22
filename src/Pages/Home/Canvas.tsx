@@ -29,7 +29,6 @@ type DraggbleItemType = 'func' | 'device' | 'timer';
 
 interface Props {
   functions: Function[];
-  // devices: Device[];
 }
 
 interface CanvasRendererProps extends Props {
@@ -215,7 +214,7 @@ class CanvasRenderer extends Component<Props, State> {
       }
     } else if (type === 'timer') {
       const modifiedFunctions = {
-        name: 'Timer' + ' ' + timerValue.toString() + 's',
+        name: 'Timer ' + timerValue.toString() + 's',
         numberOfInputs: 1,
         numberOfOutputs: 1,
         id: id,
@@ -245,6 +244,7 @@ class CanvasRenderer extends Component<Props, State> {
             numberOfInputs: droppedDevice.inputs.length,
             numberOfOutputs: droppedDevice.outputs.length,
           };
+
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
@@ -255,40 +255,114 @@ class CanvasRenderer extends Component<Props, State> {
             },
             isDevice,
             isTimer,
-            timerValue
+            timerValue,
+            subType,
           );
         }
       } else if (subType === 'Complex') {
-        const droppedDevice = devices.complexDevices
+        const droppedComplexDevice = devices.complexDevices
           .toJSON()
-          .find(func => func.id === id);
-        if (droppedDevice) {
-          let xPos = e.pageX;
-          let yPos = e.pageY;
-          droppedDevice.basicDevices.forEach(device => {
-            if (device) {
-              const modifiedResponse = {
-                id: device.id,
-                name: device.name,
-                numberOfInputs: device.inputs.length,
-                numberOfOutputs: device.outputs.length,
-              };
+          .find(device => device.id === id);
 
-              this.fabricCanvas.addNodes(
-                modifiedResponse,
-                {
-                  x: xPos,
-                  y: yPos,
-                  scale: 1,
-                  type: 'Node',
-                },
-                isDevice,
-                isTimer,
-                timerValue
-              );
-              xPos = xPos + 200;
+        let combinedNumberOfInputs = 0;
+        let combinedNumberOfOutputs = 0;
+        let scale = 1;
+
+        if (droppedComplexDevice) {
+          droppedComplexDevice.basicDevices.forEach(device => {
+            if (device) {
+              combinedNumberOfInputs += device.inputs.length;
+              combinedNumberOfOutputs += device.outputs.length;
             }
           });
+          const modifiedResponse = {
+            id: droppedComplexDevice.id,
+            name: droppedComplexDevice.name,
+            numberOfInputs: combinedNumberOfInputs,
+            numberOfOutputs: combinedNumberOfOutputs,
+          };
+
+          if (combinedNumberOfInputs > 10 || combinedNumberOfOutputs > 10) {
+            scale =
+              combinedNumberOfInputs > combinedNumberOfOutputs
+                ? 0.1 * combinedNumberOfInputs
+                : 0.1 * combinedNumberOfOutputs;
+          }
+
+          this.fabricCanvas.addNodes(
+            modifiedResponse,
+            {
+              x: e.pageX,
+              y: e.pageY,
+              scale: scale,
+              type: 'Node',
+            },
+            isDevice,
+            isTimer,
+            timerValue,
+            subType
+          );
+        }
+      } else if (subType === 'Plant') {
+        const droppedPlant = devices.plants
+          .toJSON()
+          .find(plant => plant.id === id);
+
+        let combinedNumberOfInputs = 0;
+        let combinedNumberOfOutputs = 0;
+        let scale = 1;
+
+        if (droppedPlant) {
+          droppedPlant.basicDevices.forEach(device => {
+            if (device) {
+              combinedNumberOfInputs += device.inputs.length;
+              combinedNumberOfOutputs += device.outputs.length;
+            }
+          });
+          droppedPlant.complexDevices.forEach(complexDevice => {
+            if (complexDevice) {
+              const droppedComplexDevice = devices.complexDevices
+                .toJSON()
+                .find(device => device.id === complexDevice.id);
+
+              if (droppedComplexDevice) {
+                droppedComplexDevice.basicDevices.forEach(device => {
+                  if (device) {
+                    combinedNumberOfInputs += device.inputs.length;
+                    combinedNumberOfOutputs += device.outputs.length;
+                  }
+                });
+              }
+            }
+          });
+
+          const modifiedResponse = {
+            id: droppedPlant.id,
+            name: droppedPlant.name,
+            numberOfInputs: combinedNumberOfInputs,
+            numberOfOutputs: combinedNumberOfOutputs,
+          };
+
+          if (combinedNumberOfInputs > 10 || combinedNumberOfOutputs > 10) {
+            scale =
+              combinedNumberOfInputs > combinedNumberOfOutputs
+                ? 0.1 * combinedNumberOfInputs
+                : 0.1 * combinedNumberOfOutputs;
+          }
+
+          this.fabricCanvas.addNodes(
+            modifiedResponse,
+            {
+              x: e.pageX,
+              y: e.pageY,
+              scale: scale,
+              type: 'Node',
+            },
+            isDevice,
+            isTimer,
+            timerValue,
+            subType,
+          );
         }
       }
     }
@@ -325,7 +399,7 @@ class CanvasRenderer extends Component<Props, State> {
   public render() {
     const { pages } = this.injected;
     const { currentPageId } = pages;
-    const { modalVisible } = this.state;
+    const { modalVisible, timerValue } = this.state;
 
     return (
       <div>
@@ -342,7 +416,7 @@ class CanvasRenderer extends Component<Props, State> {
               Timer Value:
               <input
                 type="number"
-                value={this.state.timerValue}
+                value={timerValue}
                 onChange={this.handleChange}
               />
             </label>

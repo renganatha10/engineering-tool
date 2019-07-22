@@ -15,6 +15,7 @@ interface AddArgs {
   data: typeof CanvasNodeData.Type;
   position: PositionType;
   isDevice: boolean;
+  subType?: string;
   isTimer: boolean;
   timerValue: number;
   isLoaded: boolean;
@@ -64,6 +65,7 @@ class Node {
     isTimer,
     timerValue,
     isLoaded,
+    subType,
   }: AddArgs) {
     const rect = new fabric.Rect({
       stroke: isDevice ? 'transparent' : 'black',
@@ -108,8 +110,14 @@ class Node {
     }
 
     if (isDevice) {
+      let type =
+        subType === 'Basic'
+          ? 'motor'
+          : subType === 'Complex'
+          ? 'complex'
+          : 'plant';
       fabric.Image.fromURL(
-        'assets/motor.png',
+        `assets/${type}.png`,
         image => {
           const nodes = [rect, image, text];
           this._addToGroup({ nodes, x, scale, y, data, isTimer });

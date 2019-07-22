@@ -139,7 +139,8 @@ class FabricController {
     position: PositionType,
     isDevice: boolean,
     isTimer: boolean,
-    timerValue: number
+    timerValue: number,
+    subType?: string
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
@@ -156,6 +157,7 @@ class FabricController {
       },
       position,
       isDevice,
+      subType,
       isTimer,
       timerValue,
       isLoaded: false,
@@ -167,15 +169,15 @@ class FabricController {
     groupId: string,
     position: PositionType
   ) => {
+    const { x, y, scale } = position;
     const inputVarient = 100 / numberOfInputs;
-    const { x, y } = position;
 
     Array.from(Array(numberOfInputs)).forEach((_, index) => {
       const y1 = 100 - inputVarient * (index + 1) + 20;
       this._inputController.add(
         {
           radius: 5,
-          top: y + y1,
+          top: y + y1 * scale,
           left: x - 5,
           fill: 'green',
           data: {
@@ -198,15 +200,15 @@ class FabricController {
     groupId: string,
     position: PositionType
   ) => {
+    const { x, y, scale } = position;
     const outPutVarient = 100 / numberOfOutputs;
     Array.from(Array(numberOfOutputs)).forEach((_, index) => {
-      const { x, y } = position;
       const y1 = 100 - outPutVarient * (index + 1) + 20;
       this._outputController.add(
         {
           radius: 5,
-          top: y + y1,
-          left: x + RECT_SIZE,
+          top: y + y1 * scale,
+          left: x + RECT_SIZE * scale,
           originX: 'center',
           originY: 'center',
           fill: 'red',
