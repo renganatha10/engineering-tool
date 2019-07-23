@@ -18,6 +18,7 @@ interface AddArgs {
   isTimer: boolean;
   timerValue: number;
   isLoaded: boolean;
+  subType: string;
 }
 
 interface PositionType {
@@ -64,6 +65,7 @@ class Node {
     isTimer,
     timerValue,
     isLoaded,
+    subType,
   }: AddArgs) {
     const rect = new fabric.Rect({
       stroke: isDevice ? 'transparent' : 'black',
@@ -104,12 +106,19 @@ class Node {
         isTimer,
         timerValue,
         type: 'Node',
+        subType,
       });
     }
 
     if (isDevice) {
+      let type =
+        subType === 'Basic'
+          ? 'motor'
+          : subType === 'Complex'
+          ? 'complex'
+          : subType === 'Plant' && 'plant';
       fabric.Image.fromURL(
-        'assets/motor.png',
+        `assets/${type}.png`,
         image => {
           const nodes = [rect, image, text];
           this._addToGroup({ nodes, x, scale, y, data, isTimer });
@@ -170,6 +179,7 @@ class Node {
 
   public onTimerClick = (option: fabric.IEvent) => {
     if (option.subTargets && option.target) {
+      //eslint-disable-next-line
       const subTarget = option.subTargets[0];
       //@ts-ignore
       const targets = option.target.getObjects();

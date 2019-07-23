@@ -91,7 +91,7 @@ class BottomBar extends React.Component<{}, State> {
     const {
       pages: { pages, currentPageId, changeCurrentPage },
     } = this.injected;
-    const { modalVisible } = this.state;
+    const { modalVisible, pageName, modelId } = this.state;
 
     return (
       <div>
@@ -108,7 +108,7 @@ class BottomBar extends React.Component<{}, State> {
               Page Name:
               <input
                 type="string"
-                value={this.state.pageName}
+                value={pageName}
                 onChange={this.handleChangeName}
               />
             </label>
@@ -118,7 +118,7 @@ class BottomBar extends React.Component<{}, State> {
               Model Id:
               <input
                 type="string"
-                value={this.state.modelId}
+                value={modelId}
                 onChange={this.handleChangeModelId}
               />
             </label>

@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import DeviceStore, {
   BasicDevice,
   ComplexDevice,
+  Plants,
 } from '../../../MobxStore/deviceStore';
 
 import DeviceCreation from './DeviceCreationModal';
@@ -62,10 +63,9 @@ const LeftBar = (props: LeftBarProps) => {
       devices.addBasicDevice(device as typeof BasicDevice.Type);
     } else if (type === 'Complex') {
       devices.addComplexDevice(device as typeof ComplexDevice.Type);
+    } else if (type === 'Plant') {
+      devices.addPlant(device as typeof Plants.Type);
     }
-    // else if (type === 'Plant') {
-    //   devices.addPlant(device as PlantType);
-    // }
 
     toggleCreateDeviceVisible(false);
   };
@@ -84,12 +84,12 @@ const LeftBar = (props: LeftBarProps) => {
     };
   });
 
-  // const plants = devices.plants.toJSON().map(plant => {
-  //   return {
-  //     id: plant.id,
-  //     name: plant.name,
-  //   };
-  // });
+  const plants = devices.plants.toJSON().map(plant => {
+    return {
+      id: plant.id,
+      name: plant.name,
+    };
+  });
 
   if (isCreateDeviceVisible) {
     return (
@@ -118,9 +118,9 @@ const LeftBar = (props: LeftBarProps) => {
         <Panel header="Complex Devices" key="2">
           <Devices data={complexDevices} type={'Complex'} />
         </Panel>
-        {/* <Panel header="Plant" key="3">
+        <Panel header="Plant" key="3">
           <Devices data={plants} type={'Plant'} />
-        </Panel> */}
+        </Panel>
       </Collapse>
     </LeftBarWrapper>
   );

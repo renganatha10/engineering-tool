@@ -26,6 +26,7 @@ class Output implements ISource {
         data: options.data,
         position: { type: 'Output', x: options.left, y: options.top },
         isDevice: false,
+        subType: '',
         type: 'Output',
       });
     }

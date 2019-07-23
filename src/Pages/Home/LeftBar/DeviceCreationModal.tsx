@@ -13,7 +13,7 @@ import DeviceStore, {
 import DeviceCreationForm from './DeviceCreationForm';
 import Header from './Header';
 import ComplexCreationForm from './ComplexDeviceCreationForm';
-// import PlantCreationForm from './PlantCreationForm';
+import PlantCreationForm from './PlantCreationForm';
 
 interface Props {
   onCancel: () => void;
@@ -105,25 +105,24 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
           onCreate(newDevice, 'Complex');
           form.resetFields();
         });
+      } else if (mode === 'Plant') {
+        form.validateFields((err, values) => {
+          if (err) {
+            return;
+          }
+          const { plantName, areas, basicDevicesId, complexDevicesId } = values;
+          const newPlant = {
+            name: plantName,
+            id: uuid(),
+            plantArea: areas,
+            basicDevices: basicDevicesId,
+            complexDevices: complexDevicesId,
+          };
+          //@ts-ignore
+          onCreate(newPlant, 'Plant');
+          form.resetFields();
+        });
       }
-      // else if (mode === 'Plant') {
-      //   form.validateFields((err, values) => {
-      //     if (err) {
-      //       return;
-      //     }
-      //     const { plantName, areas, basicDevicesId, complexDevicesId } = values;
-      //     const newPlant = {
-      //       name: plantName,
-      //       id: uuid(),
-      //       plantArea: areas,
-      //       basicDevices: basicDevicesId,
-      //       complexDevices: complexDevicesId,
-      //     };
-      //     //@ts-ignore
-      //     onCreate(newPlant, 'Plant');
-      //     form.resetFields();
-      //   });
-      // }
     }
   };
 
@@ -144,7 +143,7 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
           <Radio.Group onChange={this.onChange} value={mode}>
             <Radio value={'Basic'}>Basic Type</Radio>
             <Radio value={'Complex'}>Complex Type</Radio>
-            {/* <Radio value={'Plant'}>Plant</Radio> */}
+            <Radio value={'Plant'}>Plant</Radio>
           </Radio.Group>
         </FlexWrapper>
         {mode === 'Basic' ? (
@@ -156,12 +155,11 @@ class DeviceCreationModal extends React.PureComponent<Props, State> {
           />
         ) : (
           mode === 'Plant' && (
-            // <PlantCreationForm
-            //   wrappedComponentRef={this.saveFormRef}
-            //   basicDevices={devices.basicDevices.toJSON()}
-            //   complexDevices={devices.complexDevices.toJSON()}
-            // />
-            <div></div>
+            <PlantCreationForm
+              wrappedComponentRef={this.saveFormRef}
+              basicDevices={devices.basicDevices.toJSON()}
+              complexDevices={devices.complexDevices.toJSON()}
+            />
           )
         )}
       </Wrapper>
