@@ -199,17 +199,19 @@ class CanvasRenderer extends Component<Props, State> {
           numberOfOutputs: droppedFunction.outputs.length,
           id: droppedFunction.id,
         };
+        let subType = '';
         this.fabricCanvas.addNodes(
           modifiedFunctions,
           {
-            x: e.pageX,
-            y: e.pageY,
+            x: e.screenX,
+            y: e.screenY,
             scale: 1,
             type: 'Node',
           },
           isDevice,
           isTimer,
-          timerValue
+          timerValue,
+          subType
         );
       }
     } else if (type === 'timer') {
@@ -219,17 +221,19 @@ class CanvasRenderer extends Component<Props, State> {
         numberOfOutputs: 1,
         id: id,
       };
+      let subType = '';
       this.fabricCanvas.addNodes(
         modifiedFunctions,
         {
-          x: e.pageX,
-          y: e.pageY,
+          x: e.screenX,
+          y: e.screenY,
           scale: 1,
           type: 'Node',
         },
         isDevice,
         isTimer,
-        timerValue
+        timerValue,
+        subType
       );
     } else {
       const subType = e.dataTransfer.getData('subType');
@@ -248,15 +252,15 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.pageX,
-              y: e.pageY,
+              x: e.screenX,
+              y: e.screenY,
               scale: 1,
               type: 'Node',
             },
             isDevice,
             isTimer,
             timerValue,
-            subType,
+            subType
           );
         }
       } else if (subType === 'Complex') {
@@ -292,8 +296,8 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.pageX,
-              y: e.pageY,
+              x: e.screenX,
+              y: e.screenY,
               scale: scale,
               type: 'Node',
             },
@@ -353,15 +357,15 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.pageX,
-              y: e.pageY,
+              x: e.screenX,
+              y: e.screenY,
               scale: scale,
               type: 'Node',
             },
             isDevice,
             isTimer,
             timerValue,
-            subType,
+            subType
           );
         }
       }

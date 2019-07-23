@@ -70,7 +70,7 @@ class TypesCreation extends PureComponent<{}, State> {
 
   public render() {
     const { rehydrating, functions } = this.state;
-    const { devices: storeDevices } = this.injected;
+    const { devices } = this.injected;
     if (rehydrating) {
       return <Skeleton active={rehydrating} />;
     }
@@ -84,7 +84,7 @@ class TypesCreation extends PureComponent<{}, State> {
                 return <Canvas functions={functions} />;
               }}
             </FunctionsContext.Consumer>
-            <LeftBar devices={storeDevices} />
+            <LeftBar devices={devices} />
             <RightBar />
             <BottomBar />
           </HomeWrapper>

@@ -64,6 +64,7 @@ export const CanvasObject = types
     id: types.identifier,
     name: types.string,
     isDevice: types.boolean,
+    subType: types.optional(types.string, ''),
     isTimer: types.optional(types.boolean, false),
     timerValue: types.optional(types.number, 0),
     type: types.enumeration('type', ['Node', 'Input', 'Output', 'Line']),

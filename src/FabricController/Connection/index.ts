@@ -79,6 +79,7 @@ class Connection {
         name: 'Line',
         position: { x1, y1, y2, x2, type: 'Line' },
         isDevice: false,
+        subType: '',
         type: 'Line',
         data: { ...data, ...toData, type: 'Line' },
       });

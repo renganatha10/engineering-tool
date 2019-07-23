@@ -15,10 +15,10 @@ interface AddArgs {
   data: typeof CanvasNodeData.Type;
   position: PositionType;
   isDevice: boolean;
-  subType?: string;
   isTimer: boolean;
   timerValue: number;
   isLoaded: boolean;
+  subType: string;
 }
 
 interface PositionType {
@@ -106,6 +106,7 @@ class Node {
         isTimer,
         timerValue,
         type: 'Node',
+        subType,
       });
     }
 
@@ -115,7 +116,7 @@ class Node {
           ? 'motor'
           : subType === 'Complex'
           ? 'complex'
-          : 'plant';
+          : subType === 'Plant' && 'plant';
       fabric.Image.fromURL(
         `assets/${type}.png`,
         image => {
@@ -178,6 +179,7 @@ class Node {
 
   public onTimerClick = (option: fabric.IEvent) => {
     if (option.subTargets && option.target) {
+      //eslint-disable-next-line
       const subTarget = option.subTargets[0];
       //@ts-ignore
       const targets = option.target.getObjects();

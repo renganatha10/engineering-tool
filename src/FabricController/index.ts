@@ -67,7 +67,7 @@ class FabricController {
     this._addGrids();
     canvasObjects.forEach(object => {
       if (object.type === 'Node') {
-        const { name, data, position, isDevice, isTimer } = object;
+        const { name, data, position, isDevice, subType, isTimer } = object;
         const canvasNodeData = data as typeof CanvasNodeData.Type;
         const canvasPosition = position as typeof CanvasNodePosition.Type;
         this._nodeController.add({
@@ -78,6 +78,7 @@ class FabricController {
           isTimer,
           timerValue: 0,
           isLoaded: true,
+          subType,
         });
       } else if (object.type === 'Input') {
         const { name, data, position } = object;
@@ -140,7 +141,7 @@ class FabricController {
     isDevice: boolean,
     isTimer: boolean,
     timerValue: number,
-    subType?: string
+    subType: string
   ) => {
     const { id, name, numberOfInputs, numberOfOutputs } = func;
     const groupId = uuid();
