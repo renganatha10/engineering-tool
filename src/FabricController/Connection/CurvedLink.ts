@@ -6,9 +6,9 @@ const CurvedLink = fabric.util.createClass(Link, {
   type: 'CurvedLink',
   superType: 'link',
   //@ts-ignore
-  initialize(fromNode, fromPort, toNode, toPort, options) {
+  initialize(fromNode, fromPort, options) {
     options = options || {};
-    this.callSuper('initialize', fromNode, fromPort, toNode, toPort, options);
+    this.callSuper('initialize', fromNode, fromPort, options);
   },
   //@ts-ignore
   _render(ctx) {

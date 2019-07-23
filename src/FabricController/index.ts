@@ -297,11 +297,11 @@ class FabricController {
   };
 
   public onDocumentMouseMove = (e: MouseEvent) => {
-    const { pageX, pageY } = e;
     const line = this._connectionController.currentLine;
     if (line) {
       line.bringToFront();
-      line.set({ x2: pageX, y2: pageY });
+      const { x, y } = this._canvas.getPointer(e);
+      line.set({ x2: x, y2: y });
     }
   };
 
