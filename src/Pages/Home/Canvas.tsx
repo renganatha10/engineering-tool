@@ -181,6 +181,8 @@ class CanvasRenderer extends Component<Props, State> {
 
   public onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    //@ts-ignore
+    const pointer = this.fabricCanvas.getCanvas().getPointer(e);
     const { functions } = this.props;
     const { devices } = this.injected;
     const id = e.dataTransfer.getData('id');
@@ -203,8 +205,8 @@ class CanvasRenderer extends Component<Props, State> {
         this.fabricCanvas.addNodes(
           modifiedFunctions,
           {
-            x: e.screenX,
-            y: e.screenY,
+            x: pointer.x,
+            y: pointer.y,
             scale: 1,
             type: 'Node',
           },
@@ -225,8 +227,8 @@ class CanvasRenderer extends Component<Props, State> {
       this.fabricCanvas.addNodes(
         modifiedFunctions,
         {
-          x: e.screenX,
-          y: e.screenY,
+          x: pointer.x,
+          y: pointer.y,
           scale: 1,
           type: 'Node',
         },
@@ -252,8 +254,8 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.screenX,
-              y: e.screenY,
+              x: pointer.x,
+              y: pointer.y,
               scale: 1,
               type: 'Node',
             },
@@ -296,8 +298,8 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.screenX,
-              y: e.screenY,
+              x: pointer.x,
+              y: pointer.y,
               scale: scale,
               type: 'Node',
             },
@@ -357,8 +359,8 @@ class CanvasRenderer extends Component<Props, State> {
           this.fabricCanvas.addNodes(
             modifiedResponse,
             {
-              x: e.screenX,
-              y: e.screenY,
+              x: pointer.x,
+              y: pointer.y,
               scale: scale,
               type: 'Node',
             },
