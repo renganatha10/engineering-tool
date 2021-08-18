@@ -23,7 +23,7 @@ jobs:
       url: 'http://dev.myapp.com'
     steps:
       - name: Deploy
-        run: echo I am deploying!
+        run: echo I am deploying on dev!
 
   DeployStaging:
     name: Deploy to Staging
