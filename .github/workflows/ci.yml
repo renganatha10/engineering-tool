@@ -21,9 +21,13 @@ jobs:
     environment:
       name: Development
       url: 'http://dev.myapp.com'
+    env:
+      GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
       - name: Deploy
-        run: echo I am deploying on dev!
+        run: |
+          echo I am deploying on dev!
+          echo "$GITHUB_CONTEXT"
 
   DeployStaging:
     name: Deploy to Staging
@@ -32,9 +36,13 @@ jobs:
     environment:
       name: Staging
       url: 'http://test.myapp.com'
+    env:
+      GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
       - name: Deploy
-        run: echo I am deploying!
+        run: |
+          echo I am deploying on stage!
+          echo "$GITHUB_CONTEXT"
 
   DeployProd:
     name: Deploy to Production
@@ -43,6 +51,10 @@ jobs:
     environment:
       name: Production
       url: 'http://www.myapp.com'
+    env:
+      GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
       - name: Deploy
-        run: echo I am deploying!
+        run: |
+          echo I am deploying on prod!
+          echo "$GITHUB_CONTEXT"
