@@ -13,6 +13,35 @@ jobs:
       - name: Compile
         run: echo Hello, world!
 
+  MatrixDeploy:
+    name: matrix deployment
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - environment: Development
+            url: 'http://dev.myapps.com'
+          - environment: Staging
+            url: 'http://stage.myapps.com'
+          - environment: Production
+            url: 'http://prod.myapps.com'
+    environment:
+      name: ${{ matrix.environment }}
+      url: ${{ matrix.url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile
+        run: echo Hello, world!
+      - name: Deploy
+        env:
+          machine: ${{ matrix.environment }}
+        run: |
+          echo I am deploying on $machine
+          echo "$(git rev-parse --short HEAD)"
+
+
   DeployDev:
     name: Deploy to Dev
     needs: [Build]
